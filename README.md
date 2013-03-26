@@ -83,6 +83,7 @@ Jose Luis Verdeguer
 * pepelux enye-sec org
 * [http://www.pepelux.org/](http://www.pepelux.org/)
 
+
 Thanks to ...
 -------------
 * [Quobis](http://www.quobis.com), some hours of work through personal projects program
@@ -93,6 +94,7 @@ Thanks to ...
 (http://www.hackingvoip.com/)
 * John Matherly ([@achillean](https://twitter.com/achillean)) for SHODAN API and GHDB
 * All VoIP, free software and security hackers that we read everyday
+* [Loopsize](https://soundcloud.com/loopsize), a music hacker creator of themes included in video demos
 
 
 License

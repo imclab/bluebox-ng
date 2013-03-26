@@ -4,8 +4,7 @@ Bluebox-ng
 Bluebox-ng is a next generation UC/VoIP security tool. It has been written in CoffeeScript using Node.js powers. This project is "our 2 cents" to help to improve information security practices in VoIP/UC environments.
 
 - GitHub repo: [https://github.com/jesusprubio/bluebox-ng](https://github.com/jesusprubio/bluebox-ng)
-- Demo: TODOOOOOOOO
-[[youtube-{02AuYf66sx0}-{688}x{387}]]
+- Demo: [http://www.youtube.com/watch?v=02AuYf66sx0](http://www.youtube.com/watch?v=02AuYf66sx0)
 
 
 Install deps
@@ -67,7 +66,7 @@ Roadmap:
 
 Author
 ------
-- Jesús Pérez
+Jesús Pérez
 * [@jesusprubio](https://twitter.com/jesusprubio)
 * jesusprubio gmail com
 * [http://nicerosniunos.blogspot.com/] (http://nicerosniunos.blogspot.com/)
@@ -75,15 +74,14 @@ Author
 
 Contributors
 ------------
-- Damián Franco
+Damián Franco
 * [@pamojarpan](https://twitter.com/pamojarpan)
 * pamojarpan google com
 
-- Jose Luis Verdeguer
+Jose Luis Verdeguer
 * [@pepeluxx](https://twitter.com/pepeluxx)
 * pepelux enye-sec org
 * [http://www.pepelux.org/](http://www.pepelux.org/)
-
 
 Thanks to ...
 -------------

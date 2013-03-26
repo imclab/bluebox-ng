@@ -56,8 +56,8 @@ Roadmap:
 * Reports generation
 * Graphical user interface
 * Windows support
-* Include it in Debian
-* Include it in Kali GNU/Linux
+* Include in Debian GNU/Linux
+* Include in Kali GNU/Linux
 * Team/multi-user support
 * Documentation
 * ...

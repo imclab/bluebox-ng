@@ -40,34 +40,18 @@ There are two warnings related with WebSocket-Node module. For the moment we pre
 * Warning: Native modules not compiled.  UTF-8 validation disabled.
 
 
-Known bugs:
-----------
-* Too many modules still not implemented.
-* IPv6 support not implemented.
-* Problem with interpreter and asyncronous requests. If your prompt get lost, just push ENTER.
-* Shodan module repeats exploits and vulns. It should be parsed and identified to avoid repeated ones and to automate the process.
-* Shodan download is still not implemented in the API. Maybe we should change [SHODAN API](http://docs.shodanhq.com/rest.html) to another solution.
-* Geolocation file have to be installed apart, only country if showed if not. To solve it download these two files to folder "node_modules/geoip-lite/data":
-- https://github.com/bluesmoon/node-geoip/blob/master/data/geoip-city.dat
-- https://github.com/bluesmoon/node-geoip/blob/master/data/geoip-city-names.dat
-* If any module which uses "request" gets an error 404 the program chrashes.
-
-
-Features:
----------
-* Automatic pentesting process (VoIP, web and service vulns)
+Features (Alpha):
+----------------
 * RFC compliant
 * TLS and IPv6 support
-* SRV and NAPTR support
 * SIP over websockets (and WSS) support (draft-ietf-sipcore-sip-websocket-08)
-* REGISTER, OPTIONS, INVITE, MESSAGE, SUBSCRIBE, PUBLISH, OK, ACK, CANCEL, BYE, Ringing and Busy Here requests support
-* Extension and password brute-force through different methods (REGISTER, INVITE, SUBSCRIBE, PUBLISH, etc.)
-* DNS SRV registers discovery
 * SHODAN and Google Dorks
-* SIP common security tools
+* SIP common security tools (scan, extension/password bruteforce, etc.)
+* REGISTER, OPTIONS, INVITE, MESSAGE, SUBSCRIBE, PUBLISH, OK, ACK, CANCEL, BYE and Ringing requests support
 * SIP DoS/DDoS audit
+* SRV and NAPTR discovery
 * Dumb fuzzing
-* Common VoIP servers web management panels discovery and brute-force
+* Common VoIP servers web management panels discovery
 * Automatic exploit searching (Exploit DB, PacketStorm, Metasploit)
 * Automatic vulnerability searching (CVE, OSVDB)
 * Geolocation
@@ -75,19 +59,18 @@ Features:
 * Command completion
 
 
-Roadmap:
---------
+Roadmap (1.0):
+-------------
+* Automatic pentesting process (VoIP, web and service vulns)
 * Tor support
 * More SIP modules
+* Elegant CoffeeScript code (refactoring)
 * SIP Smart fuzzing (SIP Torture RFC)
-* Eavesdropping
 * CouchDB support (sessions)
 * IAX support
 * Web common panels post-explotation (Pepelux research)
 * A bit of command Kung Fu post-explotation
-* RTP fuzzing
-* Reports generation
-* Graphical user interface
+* Common VoIP servers web management panels discovery and brute-force
 * ...
 * Any suggestion/piece of code ;) is appreciated.
 

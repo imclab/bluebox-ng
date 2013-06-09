@@ -1,0 +1,13 @@
+v0.6
+- split code
+- 403 detection review
+- third param optional
+- proxy support
+- file donwload mode
+- pause and continue
+- verbosity control
+- solve initial cpu peak
+- improve crawling regexps
+- optimize crawler
+- error contorl for bad inputs
+- anti recursive symlinks

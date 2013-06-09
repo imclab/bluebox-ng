@@ -1,0 +1,41 @@
+{
+	"name" : "Bluebox-ng",
+	"version" : "0.0.1",
+	"description" : "A next generation VoIP security tool. It has been written in CoffeeScript using Node.js powers.",
+	"author" : { 
+		"name" : "Jesus Perez <@jesusprubio>",
+		"email" : "jesusprubio gmail com",
+		"url" : "http://nicerosniunos.blogspot.com/"
+	},
+	"contributors" : [
+		"Pepelux <pepelux enye-sec org> <http://www.pepelux.org/>",
+		"Damian Franco <pamojarpan google com>",
+		"Quobis <http://www.quobis.com>"
+	],
+	"repository" : {
+		"type" : "git",
+		"url" : "https://github.com/jesusprubio/bluebox-ng/bluebox-ng.git"
+	},
+	"private" : "true",
+	"keywords" : ["security", "tool", "VoIP", "SIP"],
+	"homepage" : "https://github.com/jesusprubio/bluebox-ng",
+	"scripts": {
+		"start" : "coffee bluebox.coffee"
+	},
+	"dependencies" : {
+		"coffee-script" : "1.4.x",
+		"underscore" : "1.4.x",
+		"request" : "2.16.x",
+		"xml2js" : "0.2.x",
+		"geoip-lite" : "1.0.x",
+		"cli-color" : "0.2.x",
+		"events" : "0.5.x",
+		"websocket" : "1.0.x",
+		"ping" : "0.1.x",
+		"portchecker" : "0.1.x",
+		"wget" : "0.0.1"
+	},
+	"engines": {
+		"node": "0.11.x"
+	}
+}

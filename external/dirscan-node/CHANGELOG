@@ -1,0 +1,32 @@
+v0.1
+- init version
+- recursive engine
+
+v0.2
+- redirection fix
+
+v0.3
+- Engine redesigned & reimplemented (queues much better than recursion)
+- Less memory required
+- faster, ~70 words per second
+- Implemented a crawler engine
+- Diferent 403 detection
+- A drupal modules wordlist (from Iñaki Rodriguez)
+
+v0.4
+- duplication control
+- 404 page check
+- non standard ports support
+- wordlists improved
+
+v0.5
+- important: fix crawler /./ dirs, this eats memory when crawl ./paths
+- queue ram optimization
+- wordpress wordlists from https://github.com/wpscanteam/wpscan/
+- more modular
+- fixed duplicated url print by crawler
+- cpu optimization 
+- diferent color for "401 Auth needed" than timeout
+
+
+

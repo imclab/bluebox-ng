@@ -1,0 +1,12 @@
+
+
+go to http://nodejs.org/ and click install (or http://nodejs.org/dist/latest/)
+
+tar zxvf  node-vxxx.tar.gz
+cd node-vxxx
+./configure
+make 
+sudo make install
+
+chmod 755 dirscan.js
+./dirscan.js

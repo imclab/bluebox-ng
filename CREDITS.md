@@ -29,7 +29,6 @@ Thanks to ...
 - David Endler and Mark Collier ([@markcollier46](https://twitter.com/markcollier46)), authors of "Hacking VoIP Exposed" book
 (http://www.hackingvoip.com/)
 - John Matherly ([@achillean](https://twitter.com/achillean)) for SHODAN API and GHDB
-- [danielz](https://github.com/danielzzz), author of node-portchecker
 - [sha0coder](https://twitter.com/sha0coder), author of dirscan-node
 - [Worlize guys](https://github.com/Worlize), developers of used Node.js websockets implementation
 - [wuchengwe](https://github.com/wuchengwei/node-wget), developers of node-wget

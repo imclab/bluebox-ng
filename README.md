@@ -3,6 +3,7 @@ Bluebox-ng
 Bluebox-ng is a next generation UC/VoIP security tool. It has been written in CoffeeScript using Node.js powers. This project is "our 2 cents" to help to improve information security practices in VoIP/UC environments.
 
 - **GitHub repo**: [https://github.com/jesusprubio/bluebox-ng](https://github.com/jesusprubio/bluebox-ng)
+- **Google group**: [https://groups.google.com/forum/?fromgroups#!forum/blueblox-ng](https://groups.google.com/forum/?fromgroups#!forum/blueblox-ng)
 
 
 Install
@@ -27,8 +28,8 @@ Install
 - *bluebox.sh*
 
 Note: There are two warnings related with WebSocket-Node module. For the moment we prefer do not compile native extensions to avoid compatibility problems. Feel free to compile by yourself following [offical documentation](https://github.com/Worlize/WebSocket-Node).
- - Warning: Native modules not compiled.  XOR performance will be degraded.
- - Warning: Native modules not compiled.  UTF-8 validation disabled.
+ - Warning: Native modules not compiled.  XOR performance will be degraded
+ - Warning: Native modules not compiled.  UTF-8 validation disabled
 
 
 Known issues
@@ -87,11 +88,11 @@ Roadmap (1.0)
 Developer guide
 ---------------
 - To contribute we use [GitHub pull requests](https://help.github.com/articles/using-pull-requests).
-- Do not include external tools not written in Node.
+- Do not include external tools not written in Node
 - Styleguide:
- - Always use camelCase, never underscores.
+ - Always use camelCase, never underscores
  - Use soft-tabs with a four space indent
- - Follow the style of any os the actual modules.
+ - Follow the style of any os the actual modules
 
 
 License

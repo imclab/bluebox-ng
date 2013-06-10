@@ -3,8 +3,7 @@ Bluebox-ng
 Bluebox-ng is a next generation UC/VoIP security tool. It has been written in CoffeeScript using Node.js powers. This project is "our 2 cents" to help to improve information security practices in VoIP/UC environments.
 
 - **GitHub repo**: [https://github.com/jesusprubio/bluebox-ng](https://github.com/jesusprubio/bluebox-ng)
-- **Google group**: [https://groups.google.com/forum/?fromgroups#!forum/blueblox-ng](https://groups.google.com/forum/?fromgroups#!forum/blueblox-ng)
-
+- **IRC(Freenode)**: #bluebox-ng
 
 Install
 -------
@@ -32,18 +31,10 @@ Note: There are two warnings related with WebSocket-Node module. For the moment 
  - Warning: Native modules not compiled.  UTF-8 validation disabled
 
 
-Known issues
+Issues
 ------------
-- IPv6 support still not implemented.
-- Problem with interpreter and asyncronous requests. If the prompt get lost, just push ENTER.
-- SHODAN download is still not implemented in the [API](http://docs.shodanhq.com/rest.html).
-- Only a few controls implemented over module parameters.
-- Be carefull with the delay that you choose to use between requests. If it were too little Node gets crazy because of its asynchronous nature.
-- If any module which uses "request" gets an error 404 the program chrashes.
-- About dirscan-node is located in "external" directory for now. We should contribute to the project:
- - Create a npm package to easily include it like the rest of external node tools.
- - Add a wordlist with common VoIP web panels paths.
- - Filter only important info of the response.
+- This is an Alpha version, so some know bugs are described here: [https://github.com/jesusprubio/bluebox-ng/issues](https://github.com/jesusprubio/bluebox-ng/issues)
+- If you have doubts playing with the software, please use this GitHub section labeling the issue as "question"
 
 
 Features (Alpha)

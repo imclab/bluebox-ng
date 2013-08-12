@@ -61,17 +61,13 @@ Features (Alpha)
 Roadmap (1.0)
 -------------
 - Automatic pentesting process (VoIP, web and services)
+- Report generation
 - Tor support
 - SIP DDoS emulation through UDP spoofing
-- SIP SQL injection
-- SIP Smart fuzzing (SIP Torture RFC)
-- DB support for sessions
-- IAX support
+- Sessions support
 - Eavesdropping
 - TFTP sniffing
-- Web common panels post-explotation (Pepelux research)
-- A bit of command Kung Fu post-explotation
-- Common VoIP servers web management panels discovery and brute-force
+- Common VoIP servers web management panels brute-force
 - ...
 - Any suggestion/piece of code is appreciated ;)
 
@@ -79,7 +75,7 @@ Roadmap (1.0)
 Developer guide
 ---------------
 - To contribute we use [GitHub pull requests](https://help.github.com/articles/using-pull-requests).
-- Do not include external tools not written in Node
+- Do not include external tools not written in Node.js
 - Styleguide:
  - Always use camelCase, never underscores
  - Use soft-tabs with a four space indent

@@ -54,7 +54,7 @@ class SipBruteExt
 			when "200"
 				Printer.printEnum testExt, "Open"
 			else
-				Printer.highlight "Last tested extension "
+				Printer.highlight "Last tested (not valid) extension "
 				Printer.normal "\"#{testExt}\"\n"
 				Printer.removeCursor()
 

@@ -80,7 +80,7 @@ class SipBruteExtAst
 		conn2.on "error", (error) ->
 
 		conn2.send msgSend
-		Printer.highlight "Last tested extension "
+		Printer.highlight "Last tested (not valid) extension "
 		Printer.normal "\"#{testExt}\"\n"
 		Printer.removeCursor()
 

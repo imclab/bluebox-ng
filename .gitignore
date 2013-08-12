@@ -2,7 +2,10 @@
 node_modules
 
 # Private modules
-src/modules/private
+src/modules/private/*
+
+# Custom options.json file
+options.json
 
 # Logs and databases
 *.log

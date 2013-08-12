@@ -159,7 +159,7 @@ runMenu = (shodanKey) ->
 	rl.prompt()
 
 	# Default parameters.
-	version = "Pre-alpha (0.0.1)"
+	version = "Alpha (0.0.1)"
 	target = "0.0.0.0"
 	transportTypes= ["UDP", "TCP", "TLS", "WS", "WSS"]
 	transport = "UDP"
@@ -169,7 +169,7 @@ runMenu = (shodanKey) ->
 	path = ""
 	# TODO: Available: 4 (ipv4), 6 (ipv6).
 	# ipVersion = 4
-	# Delay between requests.
+	# Delay between requests (in ms.).
 	delay = 100
 	rangeExt = "100-999"
 	onlyExt = "100"
@@ -394,8 +394,8 @@ runMenu = (shodanKey) ->
 												answer = onlyExt if not answer
 												onlyExt = answer
 												Printer.info "ie: \"100\", \"./data/passwords.txt\"\n"
-												rl.question "* Enter an password or a file (./data/passwords.txt): ", (answer) ->
-													answer = "./data/passwords.txt" if not answer
+												rl.question "* Enter an password or a file (./data/john.txt): ", (answer) ->
+													answer = "./data/john.txt" if not answer
 													passwords = answer
 													Printer.info "#{requestTypes}\n"
 													rl.question "* Type (REGISTER): ", (answer) ->

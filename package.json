@@ -31,8 +31,6 @@
 		"cli-color" : "0.2.x",
 		"events" : "0.5.x",
 		"websocket" : "1.0.x",
-		"ping" : "0.1.x",
-		"portchecker" : "0.1.x",
 		"wget" : "0.0.1"
 	},
 	"engines": {

@@ -39,9 +39,9 @@ class SipDns
 
 	printNaptr = (info) ->
 		Printer.info "Service: "
-		Printer.result "#{info.service}\n"
+		Printer.normal "#{info.service}\n"
 		Printer.info "Replacement: "
-		Printer.result "#{info.replacement}\n"
+		Printer.normal "#{info.replacement}\n"
 		Printer.info "Order: "
 		Printer.normal "#{info.order}\n"
 		Printer.info "Preference: "
@@ -56,43 +56,53 @@ class SipDns
 		Printer.info "Priority: "
 		Printer.normal "#{info.priority}\n"
 		Printer.info "Weight: "
-		printer.normal "#{info.weight}\n\n"
+		Printer.normal "#{info.weight}\n\n"
 
-		
-	@run : (domain) ->
 
+	@run = (domain) ->
 		# Lookup.
 		dns.lookup domain, (err, addresses, family) ->
-			if err
-				if /ENODATA/.test(err)
-					Printer.highlight "\nThis domain has no DNS records\n"
+				if err
+					if /ENODATA/.test(err)
+						Printer.highlight "\nThis domain has no DNS records\n"
+					else
+						Printer.error "sipDns: lookup: #{err}"
 				else
-					Printer.error "sipDns: #{err}"
-			else
-				printLookup addresses, family
-		
-		
-		# SRV.
-		dns.resolveSrv domain, (err, addresses) ->
-			if err
-				if /ENODATA/.test(err)
-					Printer.highlight "\nThis domain has no SRV records\n"
-				else
-					Printer.error "sipDns: #{err}"
-			else
-				for i in addresses
-					Printer.infoHigh "\nSRV =>\n"
-					printSrv i	
-
-
-		# NAPTR.
-		dns.resolveNaptr domain, (err, addresses) ->
-			if err
-				if /ENODATA/.test(err)
-					Printer.highlight "\nThis domain has no NAPTR records\n"
-				else
-					Printer.error "sipDns: #{err}"
-			else
-				Printer.infoHigh "\nNAPTR =>\n"
-				for i in addresses
-					printNaptr i
+					printLookup addresses, family		
+					# SRV.
+					dns.resolveSrv domain, (err, addresses) ->
+							if err
+								if /ENODATA/.test(err)
+									Printer.highlight "\nThis domain has no SRV records\n"
+								else
+									Printer.error "sipDns: resolveSrv: #{err}"
+							else
+								for i in addresses
+									Printer.infoHigh "\nSRV =>\n"
+									printSrv i						
+							# NAPTR.
+							dns.resolveNaptr domain, (err, addresses) ->
+								if err
+									if /ENODATA/.test(err)
+										Printer.highlight "\nThis domain has no NAPTR records\n"
+									else
+										Printer.error "sipDns: resolveNaptr: #{err}"
+								else
+									Printer.infoHigh "\nNAPTR =>\n"
+									for i in addresses
+										printNaptr i
+										dns.resolveSrv i.replacement, (err2, addresses2) ->
+											if not err2
+												for j in addresses2
+													dns.lookup j.name, (err, addresses, family) =>
+														Printer.normal "\n#{i.replacement}\n"
+														printSrv j
+														if err
+															if /ENODATA/.test(err)
+																Printer.highlight "\nThis domain has no DNS records\n"
+															else
+																Printer.error "sipDns: resolveNaptr: lookup: #{err}"
+														else
+															Printer.normal "(replacement lookup:"
+															Printer.result " #{addresses}"
+															Printer.normal ")\n\n"

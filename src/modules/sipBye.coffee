@@ -33,11 +33,9 @@ exports.SipBye =
 class SipBye
 
 	@run : (target, port, path, srcHost, transport, fromExt, toExt, cseq, callId, fromTag, toTag) ->
-		# Spoofed IP and port (at SIP layer).
-		laddress = srcHost or Utils.randomIP()
 		lport = Utils.randomPort()
 
-		msgObj = new SipMessage "BYE", "", target, port, laddress, lport, fromExt, toExt, transport, "", "", "", false, cseq, callId, "", "0", fromTag, toTag
+		msgObj = new SipMessage "BYE", "", target, port, srcHost, lport, fromExt, toExt, transport, "", "", "", false, cseq, callId, "", "0", fromTag, toTag
 		msgSend = (String) msgObj.create()
 		
 		conn = new AsteroidsConn target, port, path, transport, lport

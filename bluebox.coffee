@@ -262,7 +262,9 @@ runMenu = (shodanKey) ->
 					answer = target if answer is ""
 					target = answer
 					# TODO: Change all these controls
-					if (Grammar.ipRE.exec target or Grammar.ipRangeRE.exec target) and (target isnt "0.0.0.0")
+					#if (Grammar.ipRE.exec target or Grammar.ipRangeRE.exec target) and (target isnt "0.0.0.0")
+					# if (Grammar.ipRE.exec target) and (target isnt "0.0.0.0")
+					if true
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -307,7 +309,7 @@ runMenu = (shodanKey) ->
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
 					target = answer
-					if (Grammar.ipRE.exec target) and (target isnt "0.0.0.0")
+					if true
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -348,7 +350,7 @@ runMenu = (shodanKey) ->
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
 					target = answer
-					if (Grammar.ipRE.exec target) and (target isnt "0.0.0.0")
+					if true
 						rl.question "* Port (5060): ", (answer) ->
 							answer = "5060" if answer is ""
 							port = answer
@@ -375,7 +377,7 @@ runMenu = (shodanKey) ->
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
 					target = answer
-					if (Grammar.ipRE.exec target) and (target isnt "0.0.0.0")
+					if true
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -427,7 +429,7 @@ runMenu = (shodanKey) ->
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
 					target = answer
-					if (Grammar.ipRE.exec target) and (target isnt "0.0.0.0")
+					if true
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -512,7 +514,7 @@ runMenu = (shodanKey) ->
 					answer = target if answer is ""
 					target = answer
 					# TODO: Change all these controls
-					if (Grammar.ipRE.exec target) and (target isnt "0.0.0.0")
+					if true
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -555,7 +557,7 @@ runMenu = (shodanKey) ->
 					answer = target if answer is ""
 					target = answer
 					# TODO: Change all these controls
-					if (Grammar.ipRE.exec target) and (target isnt "0.0.0.0")
+					if true
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -605,7 +607,7 @@ runMenu = (shodanKey) ->
 					answer = target if answer is ""
 					target = answer
 					# TODO: Change all these controls
-					if (Grammar.ipRE.exec target) and (target isnt "0.0.0.0")
+					if true
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""

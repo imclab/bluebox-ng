@@ -64,11 +64,15 @@ class SipBrutePass extends EventEmitter
 
 	oneBrute = (target, port, path, srcHost, transport, type, testExt, password) ->
 		cseq = 1
-		callId = "#{Utils.uniqueId 16}@#{target}"
-		gruuInstance = "urn:uuid:#{Utils.uniqueId 3}-#{Utils.uniqueId 4}-#{Utils.uniqueId 8}"
-		srcHost = srcHost or Utils.randomIP()
+		callId = "#{Utils.randomString 16}"
+		if (Utils.isIP6 target)
+			srcHost = srcHost or Utils.randomIP6()
+		else
+			srcHost = srcHost or Utils.randomIP()
 		lport = lport or Utils.randomPort()
-		toExt = Utils.uniqueId 3
+		toExt = Utils.randomString 3
+		# Just in case of WS/WSS.
+		gruuInstance = "urn:uuid:#{Utils.randomString 3}-#{Utils.randomString 4}-#{Utils.randomString 8}"
 
 		# TODO: Maybe it could be better to call the same extension that is doing the call 
 		msgObj = new SipMessage type, "", target, port, srcHost, lport, testExt, toExt, transport, "", "", "", false, cseq, callId, gruuInstance, "", "", ""

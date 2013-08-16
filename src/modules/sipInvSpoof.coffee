@@ -40,10 +40,9 @@ class SipInvSpoof
 	
 	oneCall = (target, port, path, srcHost, transport, toExt, fromExt) ->
 		# Spoofed IP and port (at SIP layer).
-		laddress = srcHost or Utils.randomIP()
 		lport = Utils.randomPort()
 		
-		msgObj = new SipMessage "INVITE", "", target, port, laddress, lport, fromExt, toExt, transport, "", "", "", false, "", "", "", "", "", ""
+		msgObj = new SipMessage "INVITE", "", target, port, srcHost, lport, fromExt, toExt, transport, "", "", "", false, "", "", "", "", "", ""
 		msgSend = (String) msgObj.create()
 		
 		conn = new AsteroidsConn target, port, path, transport, lport

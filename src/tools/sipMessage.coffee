@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 undScore = require "underscore"
 crypto = require "crypto"
 
-
 # ----------------------- Class ----------------------------------
 
 # This class is used to define the structure of a valid SIP packet following
@@ -39,30 +38,44 @@ exports.SipMessage =
 class SipMessage
 
 	constructor : (@meth, @domain, @server, @port, @srcHost, @srcPort, @fromExt, @toExt, @transport, @realm, @nonce, @pass, @isProxy, @cseq, @callId, @gruuInstance, @expires, @fromTag, @toTag) ->
+		isV6 = false
+		isV6 = true if Utils.isIP6 @server
+		# If IPv6 URIs should have the IP address in square brackets.
+		if ((not @domain) and isV6)
+			@server = "[#{server}]"
 		@domain = @domain or @server
-		@toExt = @toExt or Utils.uniqueId 3
-		@fromExt = @fromExt or Utils.uniqueId 3
 		# Random if not provided.
+		@toExt = @toExt or Utils.randomString 3
+		@fromExt = @fromExt or Utils.randomString 3
+		# If IPv6 Via header IP address should be in square brackets but not in th SDP (above line).
+
+		if isV6
+			@srcHost = @srcHost or Utils.randomIP6()
+			# The IP address in SDP header is not in square brackets.
+			@srcHostSdp = @srcHost
+			@srcHost = "[#{@srcHost}]"
+		else
+			@srcHost = @srcHost or Utils.randomIP()
+			@srcHostSdp = @srcHost
+
+		@srcPort = @srcPort or Utils.randomPort()
+		@uriVia = "#{@srcHost}:#{@srcPort}"
 		@uri = "sip:#{@fromExt}@#{@domain}"
 		@toUri = "sip:#{@toExt}@#{@domain}"
 		@targetUri = "sip:#{@domain}"
-		@branchPad = Utils.uniqueId 30
+		@branchPad = Utils.randomString 30
 		# TODO: random better maybe?
 		@cseq = @cseq or 1
 		@sessionId = undScore.random 1000000000, 9999999999
 		@sessionPort = undScore.random 1025, 65535
 		# TODO: needed for brute-pass
 		@isProxy = false or @isProxy
-		@fromTag = @fromTag or Utils.uniqueId 10
-		@toTag = @toTag or Utils.uniqueId 10
-		@callId = @callId or "#{Utils.uniqueId 16}@#{@domain}"
-		@srcHostSdp = @srcHost
-		@tupleId = Utils.uniqueId 10
-		@srcHost = @srcHost or Utils.randomIP()
-		@srcPort = @srcPort or Utils.randomPort()
-		@uriVia = "#{@srcHost}:#{@srcPort}"
+		@fromTag = @fromTag or Utils.randomString 10
+		@toTag = @toTag or Utils.randomString 10
+		@callId = @callId or "#{Utils.randomString 16}"
+		@tupleId = Utils.randomString 10
 		@regId = 1
-		@gruuInstance = @gruuInstance or "urn:uuid:#{Utils.uniqueId 3}-#{Utils.uniqueId 4}-#{Utils.uniqueId 8}"
+		@gruuInstance = @gruuInstance or "urn:uuid:#{Utils.randomString 3}-#{Utils.randomString 4}-#{Utils.randomString 8}"
 		@expires = @expires or "3600"
 
 
@@ -89,7 +102,7 @@ class SipMessage
 		# Via. 
 		switch @transport
 			when "WS", "WSS"
-				@uriVia = "#{Utils.uniqueId 12}.invalid"
+				@uriVia = "#{Utils.randomString 12}.invalid"
 		data += "Via: SIP/2.0/#{@transport} #{@uriVia};branch=z9hG4bK#{@branchPad}\r\n"
 
 		# From.
@@ -105,7 +118,7 @@ class SipMessage
 				data += "To: #{@toExt} <#{@toUri}>;tag=#{@toTag}\r\n"
 
 		# Call-ID.
-		data += "Call-ID: #{@callId}\r\n"
+		data += "Call-ID: #{@callId}@#{@domain}\r\n"
 
 		# CSeq.
 		switch @meth

@@ -35,8 +35,6 @@ exports.SipUnAuth =
 class SipUnAuth	
 
 	@run : (target, port, path, srcHost, transport, fromExt, toExt) ->
-		# Spoofed IP and port (at SIP layer).
-		laddress = srcHost or Utils.randomIP()
 		lport = Utils.randomPort()
 		msgObj = new SipMessage "INVITE", "", target, port, srcHost, lport, fromExt, toExt, transport, "", "", "", false, "", "", "", "", "", ""
 		msgSend = (String) msgObj.create()

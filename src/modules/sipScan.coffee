@@ -77,13 +77,9 @@ class SipScan
 
 
 	oneScan = (target, port, path, srcHost, transport, type, shodanKey, isRange) ->
-		# Spoofed IP and port (at SIP layer).
-		laddress = srcHost or Utils.randomIP()
 		lport = Utils.randomPort()
-		fromExt = Utils.uniqueId 3
-		toExt = Utils.uniqueId 3
 
-		msgObj = new SipMessage type, "", target, port, laddress, lport, fromExt, toExt, transport, "", "", "", false, "", "", "", "", "", ""
+		msgObj = new SipMessage type, "", target, port, srcHost, lport, "", "", transport, "", "", "", false, "", "", "", "", "", ""
 		msgSend = (String) msgObj.create()
 		
 		conn = new AsteroidsConn target, port, path, transport, lport
@@ -118,7 +114,7 @@ class SipScan
 			netB = (initHost.split ".")[1]
 			netC = (initHost.split ".")[2]
 			netD = (initHost.split ".")[3]
-			net = "#{netA}.#{netB}.#{netC}"			
+			net = "#{netA}.#{netB}.#{netC}"
 			if (Grammar.ipRangeRE.exec target)
 				net2D = (lastHost.split ".")[3] or lastHost	
 			else

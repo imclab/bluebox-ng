@@ -34,12 +34,11 @@ class SipUnreg
 
 	@run : (target, port, path, srcHost, transport, extension, cseq, callId) ->
 		# Spoofed IP and port (at SIP layer).
-		laddress = srcHost or Utils.randomIP()
 		lport = Utils.randomPort()
 		fromExt = extension
 		toExt = extension
 
-		msgObj = new SipMessage "REGISTER", "", target, port, laddress, lport, fromExt, toExt, transport, "", "", "", false, cseq, callId, "", "0", "", ""
+		msgObj = new SipMessage "REGISTER", "", target, port, srcHost, lport, fromExt, toExt, transport, "", "", "", false, cseq, callId, "", "0", "", ""
 		msgSend = (String) msgObj.create()
 		
 		conn = new AsteroidsConn target, port, path, transport, lport

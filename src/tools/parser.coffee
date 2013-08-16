@@ -91,7 +91,7 @@ class Parser
 			Grammar.codeLineRE.test line
 		code = (codeLine.toString().match Grammar.codeRE)[0]
 		
-	
+		
 	@parseRealmNonce = (pkt) ->
 		isProxy = false
 		authLine = (String) undScore.filter pkt.toString().split("\r\n"), (line) ->
@@ -101,7 +101,12 @@ class Parser
 			authLine = (String) undScore.filter pkt.toString().split("\r\n"), (line) ->
 				Grammar.authProxyRE.test line
 		if authLine
-			authSplit = ((authLine.split ":")[1].split ",")
+			# Deleting "Proxy-Authenticate" or "WWW-Authenticate" from the string.
+			if isProxy
+				authLine = authLine[20..]
+			else
+				authLine = authLine[18..]
+			authSplit = authLine.split ","
 			for i in authSplit
 				if Grammar.realmRE.test i
 					realm = (i.split "=")[1][1...-1]

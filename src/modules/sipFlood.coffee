@@ -34,11 +34,9 @@ class SipFlood
 
 	reqNum = 1
 	oneRequest = (target, port, path, srcHost, transport, type) ->
-		# Spoofed IP and port (at SIP layer).
-		laddress = srcHost or Utils.randomIP()
 		lport = Utils.randomPort()
 
-		msgObj = new SipMessage type, "", target, port, laddress, lport, "", "", transport, "", "", "", false, "", "", "", "", "", ""
+		msgObj = new SipMessage type, "", target, port, srcHost, lport, "", "", transport, "", "", "", false, "", "", "", "", "", ""
 		msgSend = (String) msgObj.create()
 		conn = new AsteroidsConn target, port, path, transport, lport
 		

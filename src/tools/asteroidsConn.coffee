@@ -30,8 +30,7 @@ WebSocketClient = require("websocket").client
 # ----------------------- Class ----------------------------------
 
 # This class implements a connection object which supports UDP, TCP,
-# TLS, WS and WSS protocols (IPv4 and IPv6).  
-# TODO: IPv6
+# TLS, WS and WSS protocols (IPv4 and IPv6).
 exports.AsteroidsConn =
 class AsteroidsConn extends EventEmitter
 	
@@ -51,7 +50,10 @@ class AsteroidsConn extends EventEmitter
 		switch @transport
 		
 			when "UDP"
-				@client = dgram.createSocket "udp4"
+				if (net.isIPv6 @target)
+					@client = dgram.createSocket "udp6"
+				else
+					@client = dgram.createSocket "udp4"
 
 				@client.on "message", (msg, rinfo) =>
 					@emit "newMessage", msg

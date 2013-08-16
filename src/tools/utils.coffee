@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 undScore = require "underscore"
 fs = require "fs"
 {Printer} = require "./printer"
+net = require "net"
 
 
 # ----------------------- Class ----------------------------------
@@ -31,30 +32,42 @@ fs = require "fs"
 exports.Utils =
 class Utils
 		
-	# Random IP address generator.
+	# It creates a Base 36 encoded string from a random number.
+	@randomString = (length=8, base = 36) ->
+		id = ""
+		id += Math.random().toString(base).substr(2) while id.length < length
+		id.substr 0, length
+		
+	# To avoid require net, underscore, etc. in each class that needs it.
+	@isIP = net.isIP
+	
+	@isIP4 = net.isIPv4
+	
+	@isIP6 = net.isIPv6
+	
+	@randomNumber = undScore.random
+	
+	# Random IP (v4) address generator.
 	@randomIP = () ->
 		array = []
-		array.push undScore.random 1, 255 for i in [0..3]
+		array.push @randomNumber 1, 255 for i in [0..3]
 		return array.join(".")
-	
+		
+	# Random IP (v6) address generator.
+	@randomIP6 = () ->
+		array = []
+		array.push @randomString(4, 16) for i in [0..7]
+		return array.join("::")
 	
 	# Random IP address generator.
 	@randomPort = () ->
-		undScore.random 1025, 65535
-
+		@randomNumber 1025, 65535
 
 	# Random IP address generator (over 6000).
 	@randomPort2 = () ->
-		undScore.random 6000, 65535	
-
-	
-	# It creates a Base 36 encoded string from a random number.
-	@uniqueId = (length=8) ->
-		id = ""
-		id += Math.random().toString(36).substr(2) while id.length < length
-		id.substr 0, length
-
-	
+		@randomNumber 6000, 65535
+		
+		
 	# It tests if passed object is a number.
 	@isNumber = (num) ->
 		undScore.isNumber num
@@ -92,7 +105,6 @@ class Utils
 				if err
 					Printer.error "changeJsonTime: #{err}"
 					@quit
-
 
 	# It closes the app.
 	@quit = () ->

@@ -135,7 +135,7 @@ class SipBrutePass extends EventEmitter
 			@emitter.emit "passBlockEnd", "Block of passwords ended"
 
 
-	@run = (target, port, path, srcHost, transport, type, extensions, delay, passwords) =>
+	@run = (target, port, path, srcHost, transport, type, extensions, delay, passwords) ->
 		Printer.normal "\n"
 		# Extension or range.
 		# Range.			
@@ -143,7 +143,7 @@ class SipBrutePass extends EventEmitter
 			rangeExtParsed = Parser.parseExtRange extensions
 			i = parseInt(rangeExtParsed.minExt)
 			
-			@emitter.on "passBlockEnd", (msg) =>
+			@emitter.on "passBlockEnd", (msg) ->
 				if i < parseInt(rangeExtParsed.maxExt)
 					i += 1
 					brute target, port, path, srcHost, transport, type, i, passwords, delay
@@ -159,7 +159,7 @@ class SipBrutePass extends EventEmitter
 					else
 						i = 0
 						splitData = data.toString().split("\n")
-						@emitter.on "passBlockEnd", (msg) =>
+						@emitter.on "passBlockEnd", (msg) ->
 							if i < splitData.length - 2
 								i += 1
 								brute target, port, path, srcHost, transport, type, splitData[i], passwords, delay

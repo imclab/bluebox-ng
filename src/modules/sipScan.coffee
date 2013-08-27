@@ -48,7 +48,6 @@ class SipScan
 		
 
 	printScanInfoLite = (info, target) ->
-		# TODO: Print info about actual target like in other modules
 		Printer.info "\nIP address: "
 		Printer.result target
 		Printer.info ", Service: "
@@ -83,7 +82,7 @@ class SipScan
 		msgSend = (String) msgObj.create()
 		
 		conn = new AsteroidsConn target, port, path, transport, lport
-		
+
 		conn.on "newMessage", (stream) ->
 			output = getFingerPrint stream
 			if isRange
@@ -99,14 +98,19 @@ class SipScan
 						Shodan.searchVulns output.service, output.version, shodanKey
 
 		conn.on "error", (error) ->
+			# If we're not scanning a range we want to show possible errors.
 			Printer.error error if not isRange
 			
 		# A request is sent.
 		conn.send msgSend
+		Printer.highlight "Last tested target (not answering) "
+		Printer.normal "#{target}\n"
+		Printer.removeCursor()
 
 
 	@run = (target, port, path, srcHost, transport, type, shodanKey, delay) ->
 
+		Printer.normal "\n"
 		# IP range.
 		# ie: 192.168.122.1-254, ::::::1-ffff
 		if /-/.exec target
@@ -130,7 +134,6 @@ class SipScan
 			doLoop = (i) =>
 				setTimeout(=>
 					targetI = "#{netBlocks}#{blockSeparator}#{i.toString(raddix)}"
-					console.log targetI
 					oneScan targetI, port, path, srcHost, transport, type, shodanKey, true
 					if (parseInt(i, 10) < parseInt(lastBlock, raddix))
 						doLoop(parseInt(i,10) + 1)

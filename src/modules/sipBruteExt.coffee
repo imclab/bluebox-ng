@@ -76,9 +76,12 @@ class SipBruteExt
 
 	@run = (target, port, path, srcHost, transport, type, rangeExt, delay) ->
 
-		# First request to see if the server could be vulnerable.
+		# Needed to work with Node module net.isIPv6 function.
+		if (/:/.test target)
+			target = Utils.normalize6 target
 		# This extension ("olakase") is impossible to exist.
 		lport = Utils.randomPort()
+		# First request to see if the server could be vulnerable.
 		msgObj = new SipMessage type, "", target, port, srcHost, lport, "olakease", "", transport, "", "", "", false, "", "", "", "", "", ""
 		msgSend = (String) msgObj.create()
 		conn = new AsteroidsConn target, port, path, transport, lport
@@ -98,7 +101,7 @@ class SipBruteExt
 						setTimeout(=>
 							oneEnum target, port, path, srcHost, transport, type, i
 							if i < rangeExtParsed.maxExt
-								doLoopNum(parseInt(i) + 1)
+								doLoopNum(parseInt(i, 10) + 1)
 						,delay);
 					doLoopNum rangeExtParsed.minExt
 				# File with extensions.

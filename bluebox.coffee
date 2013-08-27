@@ -257,7 +257,8 @@ runMenu = (shodanKey) ->
 			when "sip-scan"
 				Printer.configure()
 				# TODO: Support CIRD format and another masks
-				Printer.info "ie: 192.168.122.1, 192.168.122.1-254, 192.168.122.1-192.168.122.254\n"
+				Printer.info "ie: 192.168.122.1, 192.168.122.1-254\n"
+				Printer.info "ie: 2001:db8:85a3:0:0:8a2e:370:7334, 2001:db8:85a3:0:0:8a2e:370:1-ffff\n"
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
 					target = answer

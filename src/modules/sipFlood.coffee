@@ -57,6 +57,9 @@ class SipFlood
 
 	@run : (target, port, path, srcHost, transport, type, numReq, delay) ->
 		Printer.normal "\n"
+		# Needed to work with Node module net.isIPv6 function.
+		if (/:/.test target)
+			target = Utils.normalize6 target		
 		doLoopNum = (i) =>
 			setTimeout(=>
 				oneRequest target, port, path, srcHost, transport, type

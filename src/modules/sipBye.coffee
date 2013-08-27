@@ -33,6 +33,10 @@ exports.SipBye =
 class SipBye
 
 	@run : (target, port, path, srcHost, transport, fromExt, toExt, cseq, callId, fromTag, toTag) ->
+
+		# Needed to work with Node module net.isIPv6 function.
+		if (/:/.test target)
+			target = Utils.normalize6 target
 		lport = Utils.randomPort()
 
 		msgObj = new SipMessage "BYE", "", target, port, srcHost, lport, fromExt, toExt, transport, "", "", "", false, cseq, callId, "", "0", fromTag, toTag

@@ -31,6 +31,7 @@ WebSocketClient = require("websocket").client
 
 # This class implements a connection object which supports UDP, TCP,
 # TLS, WS and WSS protocols (IPv4 and IPv6).
+# NOTE: It uses long IPv6 form.
 exports.AsteroidsConn =
 class AsteroidsConn extends EventEmitter
 	

@@ -51,6 +51,9 @@ class DumbFuzz
 	@run = (target, port, path, transport, fuzzString, fuzzMin, fuzzMax, delay) ->
 
 		payload = ""
+		# Needed to work with Node module net.isIPv6 function.
+		if (/:/.test target)
+			target = Utils.normalize6 target
 
 		Printer.normal "\n"
 		# Loop start with different lenghts (i).

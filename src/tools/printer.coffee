@@ -29,36 +29,6 @@ clc = require "cli-color"
 exports.Printer =
 class Printer
 
-	@printNote : (note) ->
-		data = "\nnote: #{note}"
-		process.stdout.write clc.xterm(55)(data)
-
-					
-	@printOptions : (options) ->
-		data = "\nopt: #{options}"
-		process.stdout.write clc.xterm(55)(data)
-
-
-	@printResult : (result) ->
-		data = "\n#{result}"
-		process.stdout.write clc.xterm(46)(data)
-
-	@printResult2 : (note) ->
-		data = "#{note}"
-		process.stdout.write clc.xterm(55)(data)
-			
-	@printError : (error) ->
-		data = "\nERROR: #{error}\n"
-		process.stdout.write clc.xterm(9)(data)
-
-
-	@printOutHead : () ->
-		process.stdout.write clc.bold(clc.xterm(202)("\n\n------"))
-		data = "OUTPUT"
-		process.stdout.write clc.bold(clc.xterm(202)(data))
-		process.stdout.write clc.bold(clc.xterm(202)("------"))			
-	
-# ------------------------------------------------
 	# Used colors.
 	infoColor = 55
 	infoHighColor = 63
@@ -117,7 +87,7 @@ class Printer
 
 
 	@welcome = () ->
-		data = clc.bold "\n\tWelcome to Bluebox-ng (v. 0.0.1 - Alpha)\n\n"
+		data = clc.bold "\n\tWelcome to Bluebox-ng (v. 0.1.0 - Alpha)\n\n"
 		process.stdout.write data
 		
 	

@@ -68,7 +68,7 @@ class SipInvSpoof
 				setTimeout(=>
 					oneCall target, port, path, srcHost, transport, i, callId
 					if i < rangeExtParsed.maxExt
-						doLoopNum(parseInt(i) + 1)
+						doLoopNum(parseInt(i, 10) + 1)
 				,delay);
 			doLoopNum rangeExtParsed.minExt
 		# File with extensions.
@@ -110,9 +110,9 @@ class SipInvSpoof
 				setTimeout(=>
 					targetI = "#{net}.#{i}"
 					callWithExt targetI, port, path, srcHost, transport, rangeExt, delay, callId
-					if i < parseInt(net2D)
-						doLoop(parseInt(i) + 1)
+					if i < parseInt(net2D, 10)
+						doLoop(parseInt(i, 10) + 1)
 				,delay);
-			doLoop parseInt(netD)
+			doLoop parseInt(netD, 10)
 		else
 			callWithExt target, port, path, srcHost, transport, rangeExt, delay, callId

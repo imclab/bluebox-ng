@@ -124,7 +124,7 @@ class SipBrutePass extends EventEmitter
 							oneBrute target, port, path, srcHost, transport, type, testExt, splitData[i]
 							# Last is always empty -> 2.
 							if i < splitData.length - 2
-								doLoopString(parseInt(i) + 1)
+								doLoopString(parseInt(i, 10) + 1)
 							else
 								@emitter.emit "passBlockEnd", "Block of passwords ended"
 						,delay);
@@ -137,14 +137,17 @@ class SipBrutePass extends EventEmitter
 
 	@run = (target, port, path, srcHost, transport, type, extensions, delay, passwords) ->
 		Printer.normal "\n"
+		# Needed to work with Node module net.isIPv6 function.
+		if (/:/.test target)
+			target = Utils.normalize6 target
 		# Extension or range.
 		# Range.			
 		if (Grammar.extRangeRE.exec extensions)
 			rangeExtParsed = Parser.parseExtRange extensions
-			i = parseInt(rangeExtParsed.minExt)
+			i = parseInt(rangeExtParsed.minExt, 10)
 			
 			@emitter.on "passBlockEnd", (msg) ->
-				if i < parseInt(rangeExtParsed.maxExt)
+				if i < parseInt(rangeExtParsed.maxExt, 10)
 					i += 1
 					brute target, port, path, srcHost, transport, type, i, passwords, delay
 

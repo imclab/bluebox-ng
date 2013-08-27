@@ -115,7 +115,7 @@ class SipBruteExtAst
 					setTimeout(=>
 						oneEnum target, port, srcHost, i
 						if i < rangeExtParsed.maxExt
-							doLoopNum2(parseInt(i) + 1)
+							doLoopNum2(parseInt(i, 10) + 1)
 					,delay);
 				doLoopNum2 rangeExtParsed.minExt
 			else
@@ -125,6 +125,9 @@ class SipBruteExtAst
 	@run = (target, port, srcHost, rangeExt, delay) ->
 	
 		firstTime = true
+		# Needed to work with Node module net.isIPv6 function.
+		if (/:/.test target)
+			target = Utils.normalize6 target
 		# First request to see if the server uses global NAT.
 		# This extension ("olakase") is impossible to exist.
 		lport = Utils.randomPort2()

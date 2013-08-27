@@ -36,6 +36,9 @@ class SipUnAuth
 
 	@run : (target, port, path, srcHost, transport, fromExt, toExt) ->
 		lport = Utils.randomPort()
+		# Needed to work with Node module net.isIPv6 function.
+		if (/:/.test target)
+			target = Utils.normalize6 target
 		msgObj = new SipMessage "INVITE", "", target, port, srcHost, lport, fromExt, toExt, transport, "", "", "", false, "", "", "", "", "", ""
 		msgSend = (String) msgObj.create()
 		conn = new AsteroidsConn target, port, path, transport, lport

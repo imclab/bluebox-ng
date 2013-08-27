@@ -57,7 +57,7 @@ class Utils
 	@randomIP6 = () ->
 		array = []
 		array.push @randomString(4, 16) for i in [0..7]
-		return array.join("::")
+		return array.join(":")
 	
 	# Random IP address generator.
 	@randomPort = () ->
@@ -106,7 +106,23 @@ class Utils
 					Printer.error "changeJsonTime: #{err}"
 					@quit
 
+
 	# It closes the app.
 	@quit = () ->
 		Printer.quit()
 		process.exit 0
+
+
+	# It add zeros to a block of an IPv6 address.
+	@addZeros = (block) ->
+		if block is ""
+			"0"
+		else
+			block
+
+	# It normalizes an IPv6 address to the long form.
+	@normalize6 = (add6) ->
+		normalizedAdd = []
+		splittedAdd = add6.split ":"
+		normalizedAdd.push (@addZeros i) for i in splittedAdd
+		return normalizedAdd.join(":")

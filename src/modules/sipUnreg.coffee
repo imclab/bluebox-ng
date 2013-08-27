@@ -37,6 +37,9 @@ class SipUnreg
 		lport = Utils.randomPort()
 		fromExt = extension
 		toExt = extension
+		# Needed to work with Node module net.isIPv6 function.
+		if (/:/.test target)
+			target = Utils.normalize6 target
 
 		msgObj = new SipMessage "REGISTER", "", target, port, srcHost, lport, fromExt, toExt, transport, "", "", "", false, cseq, callId, "", "0", "", ""
 		msgSend = (String) msgObj.create()

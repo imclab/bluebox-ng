@@ -29,7 +29,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {MaxMind} = require "./maxMind"
 {Grammar} = require "../tools/grammar"
 
-
 # ----------------------- Class ----------------------------------
 
 # This class includes one function which  sends a valid SIP request and parse 
@@ -49,6 +48,7 @@ class SipScan
 		
 
 	printScanInfoLite = (info, target) ->
+		# TODO: Print info about actual target like in other modules
 		Printer.info "\nIP address: "
 		Printer.result target
 		Printer.info ", Service: "
@@ -99,33 +99,48 @@ class SipScan
 						Shodan.searchVulns output.service, output.version, shodanKey
 
 		conn.on "error", (error) ->
-			Printer.printError error if not isRange
+			Printer.error error if not isRange
 			
 		# A request is sent.
 		conn.send msgSend
 
 
 	@run = (target, port, path, srcHost, transport, type, shodanKey, delay) ->
-		
-		if (Grammar.ipRangeRE.exec target) or (Grammar.ipRangeRE2.exec target)
-			initHost = (target.split "-")[0]
-			lastHost = (target.split "-")[1]
-			netA = (initHost.split ".")[0]
-			netB = (initHost.split ".")[1]
-			netC = (initHost.split ".")[2]
-			netD = (initHost.split ".")[3]
-			net = "#{netA}.#{netB}.#{netC}"
-			if (Grammar.ipRangeRE.exec target)
-				net2D = (lastHost.split ".")[3] or lastHost	
+
+		# IP range.
+		# ie: 192.168.122.1-254, ::::::1-ffff
+		if /-/.exec target
+			splittedTarget = (target.split "-") 
+			initHost = splittedTarget[0]
+			lastBlock = splittedTarget[1]
+			# If IPv6 we need the long form.
+
+			# IPv4 vs IPv6
+			if (/:/.test initHost)
+				initHost = Utils.normalize6 initHost
+				blockSeparator = ":"
+				raddix = 16
 			else
-				net2D = lastHost
+				blockSeparator = "."
+				raddix = 10
+
+			splittedHost = initHost.split "#{blockSeparator}"
+			netBlocks = splittedHost[0..(splittedHost.length-2)].join "#{blockSeparator}"
+			firstBlock = splittedHost[splittedHost.length-1]
 			doLoop = (i) =>
 				setTimeout(=>
-					targetI = "#{net}.#{i}"
+					targetI = "#{netBlocks}#{blockSeparator}#{i.toString(raddix)}"
+					console.log targetI
 					oneScan targetI, port, path, srcHost, transport, type, shodanKey, true
-					if i < parseInt(net2D)
-						doLoop(parseInt(i) + 1)
+					if (parseInt(i, 10) < parseInt(lastBlock, raddix))
+						doLoop(parseInt(i,10) + 1)
 				,delay);
-			doLoop parseInt(netD)
+			doLoop parseInt(firstBlock, raddix)
+			# TODO: Add files support. (with port)
+			# TODO: Change in the rest of the files parseInt to use 10 as raddix
+			# TODO: Add port range
 		else
+			# Needed to work with Node module net.isIPv6 function.
+			if (/:/.test target)
+				target = Utils.normalize6 target
 			oneScan target, port, path, srcHost, transport, type, shodanKey, false

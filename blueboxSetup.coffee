@@ -140,8 +140,4 @@ runMenu = () ->
 # It print init informational message.
 Printer.welcome()
 shodanKey = ""
-fs.readFile "./options.json", (err, data) ->
-	if err
-		Printer.error "Reading options.json file: #{err}"
-	else
-		runMenu()
+runMenu()

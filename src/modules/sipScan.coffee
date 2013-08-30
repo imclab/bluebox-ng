@@ -107,7 +107,6 @@ class SipScan extends EventEmitter
 			
 		# A request is sent.
 		conn.send msgSend
-		# console.log msgSend
 		if isRange
 			Printer.highlight "Last tested target "
 			Printer.normal "#{target}:#{port}\n"
@@ -134,7 +133,6 @@ class SipScan extends EventEmitter
 		else
 			# 5060, 5061, 5070
 			if /,/.exec port
-				# console.log "ENTRA ,"
 				portsList = port.split ","
 				doLoopString = (i) =>
 					setTimeout(=>

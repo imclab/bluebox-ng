@@ -7,6 +7,9 @@ src/modules/private/*
 # Logs and databases
 *.log
 
+# Custon options
+options.json
+
 # OS generated files #
 ######################
 .DS_Store

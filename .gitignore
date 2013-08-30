@@ -4,9 +4,6 @@ node_modules
 # Private modules
 src/modules/private/*
 
-# Custom options file
-options.js
-
 # Logs and databases
 *.log
 

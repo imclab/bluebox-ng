@@ -57,7 +57,7 @@ class SipBrutePass extends EventEmitter
 			when "404"
 				printBrutePass testExt, testPass if (type not in ["REGISTER", "PUBLISH"])
 			else
-				Printer.highlight "Last tested (not valid) combination "
+				Printer.highlight "Last tested combination "
 				Printer.normal "\"#{testExt}\"/\"#{testPass}\"\n"
 				Printer.removeCursor()
 
@@ -122,8 +122,7 @@ class SipBrutePass extends EventEmitter
 					doLoopString = (i) =>
 						setTimeout(=>
 							oneBrute target, port, path, srcHost, transport, type, testExt, splitData[i]
-							# Last is always empty -> 2.
-							if i < splitData.length - 2
+							if i < splitData.length - 1
 								doLoopString(parseInt(i, 10) + 1)
 							else
 								@emitter.emit "passBlockEnd", "Block of passwords ended"
@@ -163,7 +162,7 @@ class SipBrutePass extends EventEmitter
 						i = 0
 						splitData = data.toString().split("\n")
 						@emitter.on "passBlockEnd", (msg) ->
-							if i < splitData.length - 2
+							if i < splitData.length - 1
 								i += 1
 								brute target, port, path, srcHost, transport, type, splitData[i], passwords, delay
 

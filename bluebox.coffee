@@ -257,8 +257,8 @@ runMenu = (shodanKey) ->
 			when "sip-scan"
 				Printer.configure()
 				# TODO: Support CIRD format and another masks
-				Printer.info "ie: 192.168.122.1, 192.168.122.1-254\n"
-				Printer.info "ie: 2001:db8:85a3:0:0:8a2e:370:7334, 2001:db8:85a3:0:0:8a2e:370:1-ffff\n"
+				Printer.info "ie: 192.168.122.1, 192.168.122.1-254, ./data/hosts.txt,\n"
+				Printer.info "2001:db8:85a3:0:0:8a2e:370:7334, 2001:db8:85a3:0:0:8a2e:370:1-ffff\n"
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
 					target = answer
@@ -272,9 +272,11 @@ runMenu = (shodanKey) ->
 							if answer in transportTypes
 								transport = answer
 								port = portTransport transport
-								rl.question "* Port (#{port}): ", (answer) ->
+								Printer.info "ie: 5060, 5060-5070\n"
+								Printer.info "ie: \"5060,5061,5070,8080\"\n"
+								rl.question "* Ports (#{port}): ", (answer) ->
 									answer = port if answer is ""
-									if (Grammar.portRE.exec answer)
+									if true
 										port = answer										
 										Printer.info "tip: Use comand \"get-ext-ip\" to get you external IP automatically\n"
 										rl.question "* Source IP, SIP layer (random): ", (answer) ->

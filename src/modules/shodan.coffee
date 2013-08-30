@@ -99,7 +99,7 @@ class Shodan
 	@searchVulns = (service, version, key) ->
 		setTimeout callback, timeOut
 		# We use request library to get a JSON file and parse it
-#		console.log "#{baseUrl}search_exploits?q=#{service}+#{version}&key=#{key}"
+		console.log "#{baseUrl}search_exploits?q=#{service}+#{version}&key=#{key}"
 		request.get { uri:"#{baseUrl}search_exploits?q=#{service}+#{version}&key=#{key}", json: true }, (err, r, body) ->
 			connected = true
 			if err
@@ -117,7 +117,7 @@ class Shodan
 	# It makes a SHODAN API request using an specified query.
 	@searchQuery = (query, pages, key) ->
 		setTimeout callback, timeOut
-#		console.log "#{baseUrl}search?q=#{query}&p=#{pages}&key=#{key}"
+		# console.log "#{baseUrl}search?q=#{query}&p=#{pages}&key=#{key}"
 		request.get { uri:"#{baseUrl}search?q=#{query}&p=#{pages}&key=#{key}", json: true }, (err, r, body) ->
 			connected = true
 			if err

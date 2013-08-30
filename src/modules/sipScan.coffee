@@ -28,6 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {Shodan} = require "./shodan"
 {MaxMind} = require "./maxMind"
 {Grammar} = require "../tools/grammar"
+{EventEmitter} = require "events"
+fs = require "fs"
 
 # ----------------------- Class ----------------------------------
 
@@ -35,7 +37,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # the response looking for a string with "User-Agent:", "Server:" or 
 # "Organization" to get info about the SIP service which running on the target.
 exports.SipScan =
-class SipScan
+class SipScan extends EventEmitter
+
+	@emitter = new EventEmitter
 
 	printScanInfo = (info) ->
 		Printer.infoHigh "\n\nFINGERPRINT =>\n"
@@ -54,7 +58,7 @@ class SipScan
 		Printer.result info.service
 		Printer.info ", Version: "
 		Printer.result info.version
-		Printer.info "\nMessage:\n"
+		Printer.info ", Message:\n"
 		Printer.normal info.message
 
 
@@ -103,9 +107,50 @@ class SipScan
 			
 		# A request is sent.
 		conn.send msgSend
-		Printer.highlight "Last tested target (not answering) "
-		Printer.normal "#{target}\n"
-		Printer.removeCursor()
+		# console.log msgSend
+		if isRange
+			Printer.highlight "Last tested target "
+			Printer.normal "#{target}:#{port}\n"
+			Printer.removeCursor()
+
+	# It walks through different ports.
+	scan = (target, port, path, srcHost, transport, type, shodanKey, delay, isRange) =>
+
+		# ie: 5000-6000
+		if /-/.exec port
+			splittedPort = (port.split "-") 
+			initPort = splittedPort[0]
+			lastPort = splittedPort[1]
+
+			doLoopNum = (i) =>
+				setTimeout(=>
+					oneScan target, i, path, srcHost, transport, type, "", true
+					if parseInt(i, 10) < parseInt(lastPort, 10)
+						doLoopNum(parseInt(i, 10) + 1)
+					else
+						@emitter.emit "portBlockEnd", "Block of ports ended"
+				,delay);
+			doLoopNum initPort
+		else
+			# 5060, 5061, 5070
+			if /,/.exec port
+				# console.log "ENTRA ,"
+				portsList = port.split ","
+				doLoopString = (i) =>
+					setTimeout(=>
+						oneScan target, portsList[i], path, srcHost, transport, type, "", true
+						if i < portsList.length - 1
+							doLoopString(parseInt(i, 10) + 1)
+						else
+							@emitter.emit "portBlockEnd", "Block of ports ended"
+					,delay);
+				doLoopString 0
+			# Unique port.
+			else
+				isRange if isRange
+				oneScan target, port, path, srcHost, transport, type, shodanKey, isRange
+				@emitter.emit "portBlockEnd", "Block of ports ended"
+
 
 
 	@run = (target, port, path, srcHost, transport, type, shodanKey, delay) ->
@@ -117,10 +162,10 @@ class SipScan
 			splittedTarget = (target.split "-") 
 			initHost = splittedTarget[0]
 			lastBlock = splittedTarget[1]
-			# If IPv6 we need the long form.
 
 			# IPv4 vs IPv6
 			if (/:/.test initHost)
+				# If IPv6 we need the long form.
 				initHost = Utils.normalize6 initHost
 				blockSeparator = ":"
 				raddix = 16
@@ -130,20 +175,46 @@ class SipScan
 
 			splittedHost = initHost.split "#{blockSeparator}"
 			netBlocks = splittedHost[0..(splittedHost.length-2)].join "#{blockSeparator}"
-			firstBlock = splittedHost[splittedHost.length-1]
-			doLoop = (i) =>
-				setTimeout(=>
-					targetI = "#{netBlocks}#{blockSeparator}#{i.toString(raddix)}"
-					oneScan targetI, port, path, srcHost, transport, type, shodanKey, true
-					if (parseInt(i, 10) < parseInt(lastBlock, raddix))
-						doLoop(parseInt(i,10) + 1)
-				,delay);
-			doLoop parseInt(firstBlock, raddix)
-			# TODO: Add files support. (with port)
-			# TODO: Change in the rest of the files parseInt to use 10 as raddix
-			# TODO: Add port range
+
+			i = parseInt(splittedHost[splittedHost.length-1], 10)	
+			# We need a bit of synchronism to avoid problems with Node.
+			@emitter.on "portBlockEnd", (msg) ->
+				# Raddix is used to support IPv6 blocks (hex).
+				# This delay is needed in case of one (or a few) port,
+				# else Node powers saturate the OS ;).
+				setTimeout (=>
+					if i < parseInt(lastBlock, raddix)
+						i += 1
+						targetI = "#{netBlocks}#{blockSeparator}#{i.toString(raddix)}"
+						scan targetI, port, path, srcHost, transport, type, "", delay, true
+				), delay
+
+			# First request
+			targetI = "#{netBlocks}#{blockSeparator}#{i.toString(raddix)}"
+			scan targetI, port, path, srcHost, transport, type, "", delay, true
+
 		else
-			# Needed to work with Node module net.isIPv6 function.
-			if (/:/.test target)
-				target = Utils.normalize6 target
-			oneScan target, port, path, srcHost, transport, type, shodanKey, false
+			# File with targets.
+			if (Grammar.fileRE.exec target)
+				fs.readFile target, (err, data) =>
+					if err
+						Printer.error "sipScan: readFile(): #{err}"
+					else
+						i = 0
+						splitData = data.toString().split("\n")
+
+						@emitter.on "portBlockEnd", (msg) ->
+							setTimeout (=>
+								if i < (splitData.length - 1)
+									i += 1
+									scan splitData[i], port, path, srcHost, transport, type, "", delay, true
+							), delay
+
+						# First request
+						scan splitData[i], port, path, srcHost, transport, type, "", delay. true
+			# Unique target.
+			else
+				# Needed to work with Node module net.isIPv6 function.
+				if (/:/.test target)
+					target = Utils.normalize6 target
+				scan target, port, path, srcHost, transport, type, shodanKey, delay, false

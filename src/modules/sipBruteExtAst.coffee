@@ -102,8 +102,7 @@ class SipBruteExtAst
 					doLoopString2 = (i) =>
 						setTimeout(=>
 							oneEnum target, port, srcHost, splitData[i]
-							# Last is always empty -> 2.
-							if i < splitData.length - 2
+							if i < splitData.length - 1
 								doLoopString2(i + 1)
 						,delay);
 					doLoopString 0

@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var AsteroidsConn, Grammar, MaxMind, Parser, Printer, Shodan, SipMessage, SipScan, Utils;
+var AsteroidsConn, EventEmitter, Grammar, MaxMind, Parser, Printer, Shodan, SipMessage, SipScan, Utils, fs, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 SipMessage = require("../tools/sipMessage.coffee").SipMessage;
 
@@ -35,10 +37,22 @@ MaxMind = require("./maxMind").MaxMind;
 
 Grammar = require("../tools/grammar").Grammar;
 
-exports.SipScan = SipScan = (function() {
-  var getFingerPrint, oneScan, printCveDetails, printScanInfo, printScanInfoLite;
+EventEmitter = require("events").EventEmitter;
 
-  function SipScan() {}
+fs = require("fs");
+
+exports.SipScan = SipScan = (function(_super) {
+  var getFingerPrint, oneScan, printCveDetails, printScanInfo, printScanInfoLite, scan,
+    _this = this;
+
+  __extends(SipScan, _super);
+
+  function SipScan() {
+    _ref = SipScan.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  SipScan.emitter = new EventEmitter;
 
   printScanInfo = function(info) {
     Printer.infoHigh("\n\nFINGERPRINT =>\n");
@@ -57,7 +71,7 @@ exports.SipScan = SipScan = (function() {
     Printer.result(info.service);
     Printer.info(", Version: ");
     Printer.result(info.version);
-    Printer.info("\nMessage:\n");
+    Printer.info(", Message:\n");
     return Printer.normal(info.message);
   };
 
@@ -116,13 +130,56 @@ exports.SipScan = SipScan = (function() {
       }
     });
     conn.send(msgSend);
-    Printer.highlight("Last tested target (not answering) ");
-    Printer.normal("" + target + "\n");
-    return Printer.removeCursor();
+    if (isRange) {
+      Printer.highlight("Last tested target ");
+      Printer.normal("" + target + ":" + port + "\n");
+      return Printer.removeCursor();
+    }
+  };
+
+  scan = function(target, port, path, srcHost, transport, type, shodanKey, delay, isRange) {
+    var doLoopNum, doLoopString, initPort, lastPort, portsList, splittedPort;
+    if (/-/.exec(port)) {
+      splittedPort = port.split("-");
+      initPort = splittedPort[0];
+      lastPort = splittedPort[1];
+      doLoopNum = function(i) {
+        return setTimeout(function() {
+          oneScan(target, i, path, srcHost, transport, type, "", true);
+          if (parseInt(i, 10) < parseInt(lastPort, 10)) {
+            return doLoopNum(parseInt(i, 10) + 1);
+          } else {
+            return SipScan.emitter.emit("portBlockEnd", "Block of ports ended");
+          }
+        }, delay);
+      };
+      return doLoopNum(initPort);
+    } else {
+      if (/,/.exec(port)) {
+        portsList = port.split(",");
+        doLoopString = function(i) {
+          return setTimeout(function() {
+            oneScan(target, portsList[i], path, srcHost, transport, type, "", true);
+            if (i < portsList.length - 1) {
+              return doLoopString(parseInt(i, 10) + 1);
+            } else {
+              return SipScan.emitter.emit("portBlockEnd", "Block of ports ended");
+            }
+          }, delay);
+        };
+        return doLoopString(0);
+      } else {
+        if (isRange) {
+          isRange;
+        }
+        oneScan(target, port, path, srcHost, transport, type, shodanKey, isRange);
+        return SipScan.emitter.emit("portBlockEnd", "Block of ports ended");
+      }
+    }
   };
 
   SipScan.run = function(target, port, path, srcHost, transport, type, shodanKey, delay) {
-    var blockSeparator, doLoop, firstBlock, initHost, lastBlock, netBlocks, raddix, splittedHost, splittedTarget,
+    var blockSeparator, i, initHost, lastBlock, netBlocks, raddix, splittedHost, splittedTarget, targetI,
       _this = this;
     Printer.normal("\n");
     if (/-/.exec(target)) {
@@ -139,26 +196,50 @@ exports.SipScan = SipScan = (function() {
       }
       splittedHost = initHost.split("" + blockSeparator);
       netBlocks = splittedHost.slice(0, +(splittedHost.length - 2) + 1 || 9e9).join("" + blockSeparator);
-      firstBlock = splittedHost[splittedHost.length - 1];
-      doLoop = function(i) {
-        return setTimeout(function() {
+      i = parseInt(splittedHost[splittedHost.length - 1], 10);
+      this.emitter.on("portBlockEnd", function(msg) {
+        var _this = this;
+        return setTimeout((function() {
           var targetI;
-          targetI = "" + netBlocks + blockSeparator + (i.toString(raddix));
-          oneScan(targetI, port, path, srcHost, transport, type, shodanKey, true);
-          if (parseInt(i, 10) < parseInt(lastBlock, raddix)) {
-            return doLoop(parseInt(i, 10) + 1);
+          if (i < parseInt(lastBlock, raddix)) {
+            i += 1;
+            targetI = "" + netBlocks + blockSeparator + (i.toString(raddix));
+            return scan(targetI, port, path, srcHost, transport, type, "", delay, true);
           }
-        }, delay);
-      };
-      return doLoop(parseInt(firstBlock, raddix));
+        }), delay);
+      });
+      targetI = "" + netBlocks + blockSeparator + (i.toString(raddix));
+      return scan(targetI, port, path, srcHost, transport, type, "", delay, true);
     } else {
-      if (/:/.test(target)) {
-        target = Utils.normalize6(target);
+      if (Grammar.fileRE.exec(target)) {
+        return fs.readFile(target, function(err, data) {
+          var splitData;
+          if (err) {
+            return Printer.error("sipScan: readFile(): " + err);
+          } else {
+            i = 0;
+            splitData = data.toString().split("\n");
+            _this.emitter.on("portBlockEnd", function(msg) {
+              var _this = this;
+              return setTimeout((function() {
+                if (i < (splitData.length - 1)) {
+                  i += 1;
+                  return scan(splitData[i], port, path, srcHost, transport, type, "", delay, true);
+                }
+              }), delay);
+            });
+            return scan(splitData[i], port, path, srcHost, transport, type, "", delay["true"]);
+          }
+        });
+      } else {
+        if (/:/.test(target)) {
+          target = Utils.normalize6(target);
+        }
+        return scan(target, port, path, srcHost, transport, type, shodanKey, delay, false);
       }
-      return oneScan(target, port, path, srcHost, transport, type, shodanKey, false);
     }
   };
 
   return SipScan;
 
-})();
+}).call(this, EventEmitter);

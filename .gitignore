@@ -10,8 +10,12 @@ src/modules/private/*
 # Custon options
 options.json
 
-# OS generated files #
-######################
+# .js stuff
+*.js
+/src/modules/*.js
+/src/tools/*.js
+ 
+# OS generated files
 .DS_Store
 .DS_Store?
 ._*

@@ -63,75 +63,61 @@ runMenu = () ->
 			rl.on "close", () ->
 				Utils.quit()
 		
-			Printer.info "This is the first run, so we need to do"
-			Printer.highlight " some tasks"
-			Printer.info " before start to play\n\n"
-			
-			Printer.infoHigh ">> First of all I need your SHODAN API key,\n"
-			Printer.infoHigh ">> you can get it here: "
-			Printer.normal "http://www.shodanhq.com/api_doc:\n"
-			rl.question "* SHODAN Key: ", (answer) ->
-				shodanKey = answer
-				if shodanKey is ""
-					Printer.error "SHODAN key is null\n"
-					Utils.quit()
-				else
-					Utils.changeJsonKey shodanKey
-					Printer.info " - Key " 
-					Printer.highlight "\"#{shodanKey}\""
-					Printer.info " added\n"
-					Printer.infoHigh "\n>> Finally, I need to download two files to geolocate the devices (optional):\n"
-					rl.question "* Dou you want to download them? (yes): ", (answer) ->
-						answer = "yes" if answer is ""
-						if answer in ["yes","no"]
-							if answer is "yes"
-								# Delete old files (just in case).
-								exec "rm -f node_modules/geoip-lite/data/geoip-city.dat; rm -f node_modules/geoip-lite/data/geoip-city-names.dat", (err, stdout, stderr) ->
-									if err
-										Printer.error err
-									else
-										src = 'https://dl.dropboxusercontent.com/s/fo27e1xdvva811w/geoip-city.dat?token_hash=AAGXLwgAHJ7WaRui5KJqJNqOlZaSS3HHvBqytcaQZuHzQA&dl=1'
-										output = "node_modules/geoip-lite/data/geoip-city.dat"
-										download = wget.download src, output
-
-										download.on "error", (error) ->
-											Printer.error "Setup: wget: #{error}"
-											Utils.quit()
-
-										Printer.normal "\n"
-										infoProg = " - Downloading \"geoip-city.dat\"..."
-										download.on "progress", (progress) =>
-											printProgress progress, infoProg
-											
-										download.on "end", (output) =>
-											Printer.removeCursor()
-											Printer.info infoProg
-											Printer.highlight " done\n\n"
-											src2 = "https://dl.dropboxusercontent.com/s/h19n6ouhudfrdb2/geoip-city-names.dat?token_hash=AAG00buej9Uhhv-s4_5UcCJEMFvksxwDfNgt6siUkSklig&dl=1"
-											output2 = "node_modules/geoip-lite/data/geoip-city-names.dat"
-											download2 = wget.download src2, output2
-
-											download2.on "error", (error) ->
-												Printer.error "Setup: wget: #{error}"
-												Utils.quit()
-
-											infoProg2 = " - Downloading \"geoip-city-names.dat\"..."									
-											download2.on "progress", (progress2) =>
-												printProgress progress2, infoProg2
-											
-											download2.on "end", (output) =>
-												Printer.removeCursor()
-												Printer.info infoProg2
-												Printer.highlight " done\n"
-												printFinish()
-												Utils.quit()
-							# Answer "no" to download files
+			Printer.info "This is the first run, I've downloaded some stuff,\n"
+			Printer.info "but I want to do"
+			Printer.highlight " some another tasks.\n\n"
+			Printer.infoHigh "\n>> I need to download two files to geolocate the devices (optional):\n"
+			rl.question "* Dou you want to download them? (yes): ", (answer) ->
+				answer = "yes" if answer is ""
+				if answer in ["yes","no"]
+					if answer is "yes"
+						# Delete old files (just in case).
+						exec "rm -f node_modules/geoip-lite/data/geoip-city.dat; rm -f node_modules/geoip-lite/data/geoip-city-names.dat", (err, stdout, stderr) ->
+							if err
+								Printer.error err
 							else
-								printFinish()
-								Utils.quit()
-						else
-							Printer.error "Bad answer"
-							Utils.quit()
+								src = 'https://dl.dropboxusercontent.com/s/fo27e1xdvva811w/geoip-city.dat?token_hash=AAGXLwgAHJ7WaRui5KJqJNqOlZaSS3HHvBqytcaQZuHzQA&dl=1'
+								output = "node_modules/geoip-lite/data/geoip-city.dat"
+								download = wget.download src, output
+
+								download.on "error", (error) ->
+									Printer.error "Setup: wget: #{error}"
+									Utils.quit()
+
+								Printer.normal "\n"
+								infoProg = " - Downloading \"geoip-city.dat\"..."
+								download.on "progress", (progress) =>
+									printProgress progress, infoProg
+									
+								download.on "end", (output) =>
+									Printer.removeCursor()
+									Printer.info infoProg
+									Printer.highlight " done\n\n"
+									src2 = "https://dl.dropboxusercontent.com/s/h19n6ouhudfrdb2/geoip-city-names.dat?token_hash=AAG00buej9Uhhv-s4_5UcCJEMFvksxwDfNgt6siUkSklig&dl=1"
+									output2 = "node_modules/geoip-lite/data/geoip-city-names.dat"
+									download2 = wget.download src2, output2
+
+									download2.on "error", (error) ->
+										Printer.error "Setup: wget: #{error}"
+										Utils.quit()
+
+									infoProg2 = " - Downloading \"geoip-city-names.dat\"..."									
+									download2.on "progress", (progress2) =>
+										printProgress progress2, infoProg2
+									
+									download2.on "end", (output) =>
+										Printer.removeCursor()
+										Printer.info infoProg2
+										Printer.highlight " done\n"
+										printFinish()
+										Utils.quit()
+					# Answer "no" to download files
+					else
+						printFinish()
+						Utils.quit()
+				else
+					Printer.error "Bad answer"
+					Utils.quit()
 
 
 # ------------------------ Main ----------------------------------
@@ -139,5 +125,4 @@ runMenu = () ->
 # It reads options.json file and if everything is fine main code is executed.
 # It print init informational message.
 Printer.welcome()
-shodanKey = ""
 runMenu()

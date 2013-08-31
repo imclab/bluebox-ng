@@ -153,8 +153,6 @@ completer = (line) ->
 
 
 runMenu = (shodanKey) ->
-	# Command line interpreter is started (readline).
-	rl = readline.createInterface process.stdin, process.stdout, completer
 	rl.setPrompt "Bluebox-ng> "
 	rl.prompt()
 
@@ -754,12 +752,32 @@ runMenu = (shodanKey) ->
 Printer.welcome()
 printWelcome()
 shodanKey = ""
+# Command line interpreter is started (readline).
+rl = readline.createInterface process.stdin, process.stdout, completer
 fs.readFile "./options.json", (err, data) ->
 	if err
 		Printer.error "Reading \"options.json\" file: #{err}"
 	else
 		jsonData = JSON.parse data
+		shodanKey = jsonData.shodanKey
 		if jsonData.firstRun is "yes"
 			Printer.error "You should run \"./setup.sh\" before"
 		else
-			runMenu jsonData.shodanKey
+			if shodanKey is ""
+				Printer.infoHigh ">> To get SHODAN support you need to add your API key:\n"
+				Printer.normal ">> (http://www.shodanhq.com/api_doc)\n"
+				Printer.infoHigh ">> (If you don't want it just leave it empty)\n"
+				rl.question "* SHODAN Key: ", (answer) =>
+					shodanKey = answer
+					if shodanKey is ""
+						runMenu jsonData.shodanKey
+					else
+						Utils.changeJsonKey shodanKey
+						Printer.info " - Key "
+						Printer.highlight "\"#{shodanKey}\""
+						Printer.info " added\n"
+						runMenu jsonData.shodanKey
+			else
+				Printer.info "\n - Your SHODAN key is "
+				Printer.highlight "\"#{shodanKey}\"\n"
+				runMenu jsonData.shodanKey

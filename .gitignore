@@ -15,7 +15,7 @@ options.json
 /src/modules/*.js
 /src/tools/*.js
  
-# OS generated files
+# OS files
 .DS_Store
 .DS_Store?
 ._*

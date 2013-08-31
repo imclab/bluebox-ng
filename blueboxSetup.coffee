@@ -119,9 +119,6 @@ runMenu = () ->
 					Printer.error "Bad answer"
 					Utils.quit()
 
-
-# ------------------------ Main ----------------------------------
-
 # It reads options.json file and if everything is fine main code is executed.
 # It print init informational message.
 Printer.welcome()

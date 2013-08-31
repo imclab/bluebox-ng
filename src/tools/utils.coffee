@@ -82,7 +82,7 @@ class Utils
 				@quit
 			else
 				optionsFile = fileContents
-				newOptionsFile = optionsFile.replace /nokey/, shodanKey
+				newOptionsFile = optionsFile.replace /""/, "\"#{shodanKey}\""
 				# Replacing body.jade file
 				fs.writeFile file, newOptionsFile, "utf8", (err) =>
 					if err

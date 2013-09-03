@@ -25,7 +25,8 @@ web.get = function(url,cb,errcb) {
 		port: 80, 
 		method: 'GET',
 		path: url.replace(/^https?:?\/\/[^\/]+/,''),
-		rejectUnauthorized: true,
+        // To report: Changed by bluebox to support https with not-not valid certs.
+		rejectUnauthorized: false,
 		headers: {
 			'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:20.0) Gecko/20100101 Firefox/20.0'
 		}

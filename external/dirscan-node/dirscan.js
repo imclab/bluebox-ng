@@ -144,20 +144,19 @@ scan.run = function(url, file) {
 scan.main = function() {
       var url,file,ext;
 
-//      if (process.argv.length<5) {
-//            console.log('dirscan.js  Web directory scanner, by @sha0coder');
-//            console.log('powered by node.js\n');
-//            console.log('EXAMPLE:');
-//            console.log('  ./dirscan.js http://url.com/ wordlists/dirs.txt \'.php,.cfg,.conf,.sql,.log,.txt,.tar,.zip,.gz,.bz2,.tar.gz,.tar.bz2\'');
-//            process.exit();
-//      }
+      if (process.argv.length<5) {
+            console.log('dirscan.js  Web directory scanner, by @sha0coder');
+            console.log('powered by node.js\n');
+            console.log('EXAMPLE:');
+            console.log('  ./dirscan.js http://url.com/ wordlists/dirs.txt \'.php,.cfg,.conf,.sql,.log,.txt,.tar,.zip,.gz,.bz2,.tar.gz,.tar.bz2\'');
+            process.exit();
+      }
 
 
       url = furl.fixUrl(process.argv[2]);
 
       file = process.argv[3];
-//      ext = '/,'+process.argv[4];
-      ext = '.php,.cfg,.conf,.sql,.log,.txt,.tar,.zip,.gz,.bz2,.tar.gz,.tar.bz2'
+      ext = '/,'+process.argv[4];
       scan.ext = ext.split(',');
 
       console.log("Scanning ...");

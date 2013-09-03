@@ -58,24 +58,10 @@ Features (Alpha)
 - It runs in GNU/Linux, Mac OS X and Windows
 
 
-Roadmap (1.0)
--------------
-- Automatic pentesting process (VoIP, web and services)
-- Report generation
-- Tor support
-- SIP DDoS emulation through UDP spoofing
-- Sessions support
-- Eavesdropping
-- TFTP sniffing
-- Common VoIP servers web management panels brute-force
-- ...
-- Any suggestion/piece of code is appreciated ;)
-
-
 Developer guide
 ---------------
 - To contribute we use [GitHub pull requests](https://help.github.com/articles/using-pull-requests).
-- Do not include external tools not written in Node.js
+- Only include external tools written in Node.js
 - Styleguide:
  - Always use camelCase, never underscores
  - Use soft-tabs with a four space indent

@@ -20,8 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # ---------------------- Requires --------------------------------
 
-util = require "util"
-spawn = require("child_process").spawn
 {Printer} = require "../tools/printer.coffee"
 {BashCommand} = require "./bashCommand"
 
@@ -37,6 +35,6 @@ class WebDiscover
 		if type is "quick"
 			file = "#{basePath}dirs.txt"
 		else
-			file = "#{basePath}big.txt"
-
-		BashCommand.run "external/dirscan-node/dirscan.js #{url} #{file}"
+            file = "#{basePath}big.txt"
+        
+        BashCommand.run "node external/dirscan-node/dirscan.js #{url} #{file} \'.php,.cfg,.conf,.sql,.log,.txt,.tar,.zip,.gz,.bz2,.tar.gz,.tar.bz2\'"

@@ -43,7 +43,7 @@ fs = require "fs"
 {SipBye} = require "./src/modules/sipBye"
 {DumbFuzz} = require "./src/modules/dumbFuzz"
 {BashCommand} = require "./src/modules/bashCommand"
-
+{NetworkScan} = require "./src/modules/networkScan"
 
 # --------------------- Functions --------------------------------
 
@@ -106,10 +106,12 @@ printCommands = () ->
 #	Printer.highlight "web-auto: "
 #	Printer.normal "Discover and bruteforce common web panel of VoIP servers in a host.\n"
 	Printer.highlight "web-discover: "
-	Printer.normal "Discover common web panel of a VoIP servers in a host (dirscan-node).\n"
+	Printer.normal "Discover common web panel of a VoIP servers in a host (Dirscan-node).\n"
 #	Printer.highlight "web-brute: "
 #	Printer.normal "Bruteforce credentials of a VoIP server web panel.\n"
 	Printer.infoHigh "\nMORE\n"
+	Printer.highlight "network-scan: "
+	Printer.normal "Host/port scanning (Evilscan)"
 	Printer.highlight "shodan-host: "
 	Printer.normal "Get indexed info of an IP address in SHODAN.\n"
 	Printer.highlight "shodan-vulns': "
@@ -121,7 +123,7 @@ printCommands = () ->
 	Printer.highlight "default-pass: "
 	Printer.normal "Show common VoIP system default passwords.\n"
 	Printer.highlight "geo-locate: "
-	Printer.normal "Geolozalization of a host using Maxmind DB.\n"
+	Printer.normal "Geolozalization (Maxmind DB).\n"
 	Printer.highlight "get-ext-ip: "
 	Printer.normal "Get you external IP address (icanhazip.com).\n"
 	Printer.infoHigh "\nENV\n"
@@ -141,7 +143,7 @@ completer = (line) ->
 	completions += "sip-dns sip-scan sip-brute-ext sip-brute-ext-ast sip-brute-pass "
 	completions += "sip-unauth sip-inv-spoof sip-unreg "
 	completions += "sip-bye sip-flood dumb-fuzz "
-	completions += "web-discover "
+	completions += "web-discover network-scan "
 	completions += "shodan-host shodan-vulns shodan-query shodan-download default-pass "
 	completions += "geo-locate get-ext-ip clear help version quit exit"
 	completSplit = completions.split " "
@@ -188,6 +190,30 @@ runMenu = (shodanKey) ->
 	# On new line, it's parsed and related module is launched with chosen params.
 	rl.on "line", (line) ->
 		switch line.trim()
+			when "network-scan"
+				Printer.configure()
+				Printer.info "ie: 192.168.122.1, 192.168.122.0/24\n"
+				rl.question "* Target (#{target}): ", (answer) ->
+					answer = target if answer is ""
+					if true
+						target = answer
+						# TODO: Change all these controls
+						Printer.info "opt: Evilscan only supports full TCP scan for now\n"
+						# rl.question "* Type (full TCP): ", (answer) ->
+							# answer = transport if answer is ""
+							# if answer in transportTypes
+								# transport = answer
+						Printer.info "ie: 80\n"
+						Printer.info "ie: 21,22,23,5060-5070\n"
+						rl.question "* Ports (21,22,23,80,443,4443,4444,5060-5070,8080): ", (answer) ->
+							answer = "21,22,23,80,443,4443,4444,5060-5070,8080" if answer is ""
+							if true
+								port = answer										
+								NetworkScan.run target, port
+							else
+								Printer.error "Invalid port"
+					else
+						Printer.error "Invalid target"
 			when "shodan-search"
 				Printer.configure()
 				if not shodanKey
@@ -213,7 +239,7 @@ runMenu = (shodanKey) ->
 				else
 					rl.question "* Target (1.1.1.1): ", (answer) ->
 						answer = "1.1.1.1" if answer is ""
-						if (Grammar.ipRE.exec answer)
+						if true
 							target = answer
 							Shodan.searchHost target, shodanKey
 						else
@@ -241,8 +267,8 @@ runMenu = (shodanKey) ->
 						pages = "1"
 						Shodan.searchQuery query, pages, shodanKey
 			when "shodan-download"
-				Printer.error "Still not implemented in SHODAN, so we have to download it manually for now :(."
-	#			Shodan.download "18659", shodanKey
+				Printer.error "This feature is still not implemented in SHODAN API, so we have to download it manually for now :(."
+                #Shodan.download "18659", shodanKey
 			when "shodan-pop"
 				Shodan.searchPopular()
 			when "google-dorks"
@@ -471,7 +497,7 @@ runMenu = (shodanKey) ->
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
 					target = answer
-					if (Grammar.ipRE.exec target or Grammar.ipRangeRE.exec target) and (target isnt "0.0.0.0")
+					if true
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -654,7 +680,7 @@ runMenu = (shodanKey) ->
 				rl.question "* Target (127.0.0.1): ", (answer) ->
 					answer = "127.0.0.1" if answer is ""
 					target = answer
-					if ((Grammar.ipRE.exec target) and (target isnt "0.0.0.0"))
+					if true
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -702,7 +728,7 @@ runMenu = (shodanKey) ->
 				rl.question "* Target (#{targetWeb}): ", (answer) ->
 					answer = targetWeb if answer is ""
 					targetWeb = answer
-					if ((Grammar.ipRE.exec targetWeb) or (Grammar.httpRE.exec targetWeb))
+					if true
 						Printer.info "ie: quick, large\n"
 						rl.question "* Type (quick): ", (answer) ->
 							answer = "quick" if answer is ""
@@ -767,7 +793,7 @@ fs.readFile "./options.json", (err, data) ->
 				Printer.infoHigh ">> To get SHODAN support you need to add your API key:\n"
 				Printer.normal ">> (http://www.shodanhq.com/api_doc)\n"
 				Printer.infoHigh ">> (If you don't want it just leave it empty)\n"
-				rl.question "* SHODAN Key: ", (answer) =>
+				rl.question "* SHODAN Key: ", (answer) ->
 					shodanKey = answer
 					if shodanKey is ""
 						runMenu jsonData.shodanKey
@@ -778,6 +804,4 @@ fs.readFile "./options.json", (err, data) ->
 						Printer.info " added\n"
 						runMenu jsonData.shodanKey
 			else
-				Printer.info "\n - Your SHODAN key is "
-				Printer.highlight "\"#{shodanKey}\"\n"
 				runMenu jsonData.shodanKey

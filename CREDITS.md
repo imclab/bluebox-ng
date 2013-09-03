@@ -34,4 +34,5 @@ Thanks to ...
 - [wuchengwe](https://github.com/wuchengwei/node-wget), developers of node-wget
 - [mediko](https://github.com/medikoo/cli-color), developers of cli-color
 - [bmatzelle](https://github.com/bmatzelle), Gow developer 
+- [eviltik](https://github.com/eviltik/evilscan), Evilscan port scanner creator
 - All VoIP, free software and security hackers that we read everyday

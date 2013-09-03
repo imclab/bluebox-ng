@@ -99,20 +99,23 @@ class Shodan
 	@searchVulns = (service, version, key) ->
 		setTimeout callback, timeOut
 		# We use request library to get a JSON file and parse it
-		# console.log "#{baseUrl}search_exploits?q=#{service}+#{version}&key=#{key}"
+		#console.log "#{baseUrl}search_exploits?q=#{service}+#{version}&key=#{key}"
 		request.get { uri:"#{baseUrl}search_exploits?q=#{service}+#{version}&key=#{key}", json: true }, (err, r, body) ->
 			connected = true
 			if err
-				Printer.error "Shodan: connection problem: #{err}"
+				Printer.error "SHODAN: connection problem: #{err}"
 			else
 				if body.error
-					Printer.error "Shodan: #{body.error}"
+					Printer.error "SHODAN: #{body.error}"
 				else
-					if body.total isnt 0
-						printVulnsInfo info for info in body.matches
-					else
-						Printer.highlight "\nNo vulns found.\n"
-
+					if (/maintenance/.exec body)
+                        Printer.error "SHODAN API is undergoing maintenance :("
+                    else
+                        if body.total isnt 0
+                            printVulnsInfo info for info in body.matches
+                        else
+                            Printer.highlight "\nNo vulns found.\n"
+                            
 
 	# It makes a SHODAN API request using an specified query.
 	@searchQuery = (query, pages, key) ->
@@ -121,18 +124,21 @@ class Shodan
 		request.get { uri:"#{baseUrl}search?q=#{query}&p=#{pages}&key=#{key}", json: true }, (err, r, body) ->
 			connected = true
 			if err
-				Printer.error "Shodan: connection problem: #{err}"
+				Printer.error "SHODAN: connection problem: #{err}"
 			else
 				if body.error
-					Printer.error "Shodan: #{body.error}"
+					Printer.error "SHODAN: #{body.error}"
 				else
-					results = body.matches
-					if body.total isnt 0
-						printTargetInfo info for info in results when info.city
-						Printer.info "\n\nTotal: "
-						Printer.result body.total + "\n"
-					else
-						Printer.highlight "\nNo hosts found :(\n"
+                    if (/maintenance/.exec body)
+                        Printer.error "SHODAN API is undergoing maintenance :("
+                    else
+                        results = body.matches
+                        if body.total isnt 0
+                            printTargetInfo info for info in results when info.city
+                            Printer.info "\n\nTotal: "
+                            Printer.result body.total + "\n"
+                        else
+                            Printer.highlight "\nNo hosts found :(\n"
 
 
 	# It search for indexed hosts running specified service version.
@@ -142,6 +148,7 @@ class Shodan
 		query += "+#{version}" if version
 		query += "+port%3A#{port}" if port
 		query += "+country%3A#{country}" if country
+		# console.log "QUERY: #{query}"
 		@searchQuery query, pages, key
 
 
@@ -152,12 +159,15 @@ class Shodan
 		request.get { uri:"#{baseUrl}host?ip=#{ipAddress}&key=#{key}", json: true }, (err, r, body) ->
 			connected = true
 			if err
-				Printer.error "Shodan: connection problem: #{err}"
+				Printer.error "SHODAN: connection problem: #{err}"
 			else
-				if body.error
-					Printer.error "Shodan: #{body.error}"
-				else
-					printHostData body
+                if (/maintenance/.exec body)
+                    Printer.error "SHODAN API is undergoing maintenance :("
+                else
+                    if body.error
+                        Printer.error "SHODAN: #{body.error}"
+                    else
+                        printHostData body
 
 
 	# It uses a SHODAN RSS feed to get latest popular search related with VoIP.
@@ -166,10 +176,10 @@ class Shodan
 		request.get { uri:"#{popularUrl}", json: false }, (err, r, body) ->
 			connected = true
 			if err
-				Printer.error "Shodan: connection problem: #{err}."
+				Printer.error "SHODAN: connection problem: #{err}."
 			else
 				if body.error
-					Printer.error "Shodan: #{body.error}"
+					Printer.error "SHODAN: #{body.error}"
 				else
 					parser = new xml2js.Parser().parseString
 					parser body, (err, result) ->

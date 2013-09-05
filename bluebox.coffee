@@ -735,7 +735,8 @@ fs.readFile "./options.json", (err, data) ->
 		else
 			if shodanKey is ""
 				Printer.infoHigh ">> To get SHODAN support you need to add your API key:\n"
-				Printer.normal ">> (http://www.shodanhq.com/api_doc)\n"
+				Printer.infoHigh ">> "
+				Printer.normal "(http://www.shodanhq.com/api_doc)\n"
 				Printer.infoHigh ">> (If you don't want it just leave it empty)\n"
 				rl.question "* SHODAN Key: ", (answer) ->
 					shodanKey = answer

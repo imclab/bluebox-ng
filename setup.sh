@@ -28,5 +28,5 @@ rm -rf node_modules
 echo "Installing a new version of them ..."
 npm install
 
-# App dependencies are installed and SHODAN key is asked.
+# Some tasks.
 node_modules/coffee-script/bin/coffee blueboxSetup.coffee

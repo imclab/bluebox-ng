@@ -38,7 +38,6 @@ fs = require "fs"
 {WebDiscover} = require "./src/modules/webDiscover"
 {SipFlood} = require "./src/modules/sipFlood"
 {SipUnAuth} = require "./src/modules/sipUnAuth"
-{SipInvSpoof} = require "./src/modules/sipInvSpoof"
 {SipUnreg} = require "./src/modules/sipUnreg"
 {SipBye} = require "./src/modules/sipBye"
 {DumbFuzz} = require "./src/modules/dumbFuzz"
@@ -92,8 +91,6 @@ printCommands = () ->
 	Printer.normal "Try to brute-force the password for an extension.\n"
 	Printer.highlight "sip-unauth: "
 	Printer.normal "Try know if a SIP server allows unauthenticated calls.\n"
-	Printer.highlight "sip-inv-spoof: "
-	Printer.normal "Make a call with an spoofed caller id.\n"
 	Printer.highlight "sip-unreg: "
 	Printer.normal "Try to unregister another endpoint.\n"
 	Printer.highlight "sip-bye: "
@@ -141,7 +138,7 @@ printCommands = () ->
 completer = (line) ->
 	completions = "\nall-auto shodan-search shodan-pop google-dorks "
 	completions += "sip-dns sip-scan sip-brute-ext sip-brute-ext-ast sip-brute-pass "
-	completions += "sip-unauth sip-inv-spoof sip-unreg "
+	completions += "sip-unauth sip-unreg "
 	completions += "sip-bye sip-flood dumb-fuzz "
 	completions += "web-discover network-scan "
 	completions += "shodan-host shodan-vulns shodan-query shodan-download default-pass "
@@ -195,7 +192,7 @@ runMenu = (shodanKey) ->
 				Printer.info "ie: 192.168.122.1, 192.168.122.0/24\n"
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
-					if true
+					if ((Utils.isIP answer) or (Utils.isIP (answer.split "/")[0]))
 						target = answer
 						# TODO: Change all these controls
 						Printer.info "opt: Evilscan only supports full TCP scan for now\n"
@@ -207,8 +204,8 @@ runMenu = (shodanKey) ->
 						Printer.info "ie: 21,22,23,5060-5070\n"
 						rl.question "* Ports (21,22,23,80,443,4443,4444,5060-5070,8080): ", (answer) ->
 							answer = "21,22,23,80,443,4443,4444,5060-5070,8080" if answer is ""
-							if true
-								port = answer										
+							if (Utils.validPort answer)
+								port = answer
 								NetworkScan.run target, port
 							else
 								Printer.error "Invalid port"
@@ -239,7 +236,7 @@ runMenu = (shodanKey) ->
 				else
 					rl.question "* Target (1.1.1.1): ", (answer) ->
 						answer = "1.1.1.1" if answer is ""
-						if true
+						if (Utils.isIP answer)
 							target = answer
 							Shodan.searchHost target, shodanKey
 						else
@@ -280,16 +277,12 @@ runMenu = (shodanKey) ->
 					SipDns.run dnsDomain
 			when "sip-scan"
 				Printer.configure()
-				# TODO: Support CIRD format and another masks
 				Printer.info "ie: 192.168.122.1, 192.168.122.1-254, ./data/hosts.txt,\n"
 				Printer.info "2001:db8:85a3:0:0:8a2e:370:7334, 2001:db8:85a3:0:0:8a2e:370:1-ffff\n"
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
-					target = answer
-					# TODO: Change all these controls
-					#if (Grammar.ipRE.exec target or Grammar.ipRangeRE.exec target) and (target isnt "0.0.0.0")
-					# if (Grammar.ipRE.exec target) and (target isnt "0.0.0.0")
-					if true
+					if ((Utils.isIP answer) or (Utils.isIP (answer.split "-")[0]))
+						target = answer
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -300,7 +293,7 @@ runMenu = (shodanKey) ->
 								Printer.info "ie: \"5060,5061,5070,8080\"\n"
 								rl.question "* Ports (#{port}): ", (answer) ->
 									answer = port if answer is ""
-									if true
+									if (Utils.validPort answer)
 										port = answer										
 										Printer.info "tip: Use comand \"get-ext-ip\" to get you external IP automatically\n"
 										rl.question "* Source IP, SIP layer (random): ", (answer) ->
@@ -335,8 +328,8 @@ runMenu = (shodanKey) ->
 				Printer.info "ie: 192.168.122.1\n"
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
-					target = answer
-					if true
+					if (Utils.isIP answer)
+						target = answer
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -345,7 +338,7 @@ runMenu = (shodanKey) ->
 								port = portTransport transport
 								rl.question "* Port (#{port}): ", (answer) ->
 									answer = port if answer is ""
-									if (Grammar.portRE.exec answer)
+									if (Utils.validPort answer)
 										port = answer										
 										Printer.info "tip: Use comand \"get-ext-ip\" to get you external IP automatically\n"
 										rl.question "* Source IP, SIP layer (random): ", (answer) ->
@@ -376,12 +369,11 @@ runMenu = (shodanKey) ->
 				Printer.info "ie: 192.168.122.1\n"
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
-					target = answer
-					if true
+					if (Utils.isIP answer)
+						target = answer
 						rl.question "* Port (5060): ", (answer) ->
 							answer = "5060" if answer is ""
-							port = answer
-							if (Grammar.portRE.exec answer)
+							if (Utils.validPort answer)
 								port = answer										
 								Printer.info "tip: Use comand \"get-ext-ip\" to get you external IP automatically\n"
 								rl.question "* Source IP, SIP layer (random): ", (answer) =>
@@ -403,8 +395,8 @@ runMenu = (shodanKey) ->
 				Printer.info "ie: 192.168.122.1\n"
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
-					target = answer
-					if true
+					if (Utils.isIP answer)
+						target = answer
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -413,7 +405,7 @@ runMenu = (shodanKey) ->
 								port = portTransport transport
 								rl.question "* Port (#{port}): ", (answer) ->
 									answer = port if answer is ""
-									if (Grammar.portRE.exec answer)
+									if (Utils.validPort answer)
 										port = answer
 										Printer.info "tip: Use comand \"get-ext-ip\" to get you external IP automatically\n"
 										rl.question "* Source IP, SIP layer (random): ", (answer) ->
@@ -455,8 +447,8 @@ runMenu = (shodanKey) ->
 				Printer.info "ie: 192.168.122.1\n"
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
-					target = answer
-					if true
+					if (Utils.isIP answer)
+						target = answer
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -465,7 +457,7 @@ runMenu = (shodanKey) ->
 								port = portTransport transport
 								rl.question "* Port (#{port}): ", (answer) ->
 									answer = port if answer is ""
-									if (Grammar.portRE.exec answer)
+									if (Utils.validPort answer)
 										port = answer										
 										Printer.info "tip: Use comand \"get-ext-ip\" to get you external IP automatically\n"
 										rl.question "* Source IP, SIP layer (random): ", (answer) ->
@@ -490,58 +482,12 @@ runMenu = (shodanKey) ->
 								Printer.error "Invalid transport"
 					else
 						Printer.error "Invalid target"
-			when "sip-inv-spoof"
-				Printer.configure()
-				# TODO: Support CIRD format and another masks
-				Printer.info "ie: 192.168.122.1, 192.168.122.1-254, 192.168.122.1-192.168.122.254\n"
-				rl.question "* Target (#{target}): ", (answer) ->
-					answer = target if answer is ""
-					target = answer
-					if true
-						Printer.info "opt:#{transportTypes}\n"
-						rl.question "* Transport (#{transport}): ", (answer) ->
-							answer = transport if answer is ""
-							if answer in transportTypes
-								transport = answer
-								port = portTransport transport
-								rl.question "* Port (#{port}): ", (answer) ->
-									answer = port if answer is ""
-									if (Grammar.portRE.exec answer)
-										port = answer										
-										Printer.info "tip: Use comand \"get-ext-ip\" to get you external IP automatically\n"
-										rl.question "* Source IP, SIP layer (random): ", (answer) ->
-											srcHost = answer
-											Printer.info "ie: \"100\", \"100-999\", \"./data/extensions.txt\"\n"
-											rl.question "* Enter an extension to call, a range or a file (100): ", (answer) ->
-												answer = "100" if not answer
-												rangeExt = answer
-												rl.question "* CallerID (#{callerId}): ", (answer) ->
-													answer = callerId if answer is ""
-													callerId = answer
-													rl.question "* Delay between requests (ms.) (#{delay}): ", (answer) ->
-														answer = delay if answer is ""
-														delay = answer
-														if transport is "WS" or transport is "WSS"
-															Printer.info "tip: You should provide a \"Path\" using WS (or WSS)\n"
-															Printer.info "tip: Final format \"ws:\\Target:Port:Path\"\n"
-															rl.question "\n* Path (#{path}): ", (answer) ->
-																path = answer
-																SipInvSpoof.run target, port, path, srcHost, transport, rangeExt, delay, callerId
-														else
-															SipInvSpoof.run target, port, "", srcHost, transport, rangeExt, delay, callerId
-									else
-										Printer.error "Invalid port"
-							else
-								Printer.error "Invalid transport"
-					else
-						Printer.error "Invalid target"
 			when "sip-unreg"
 				Printer.configure()
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
-					target = answer
-					# TODO: Change all these controls
-					if true
+					if (Utils.isIP answer)
+						target = answer
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -550,7 +496,7 @@ runMenu = (shodanKey) ->
 								port = portTransport transport
 								rl.question "* Port (#{port}): ", (answer) ->
 									answer = port if answer is ""
-									if (Grammar.portRE.exec answer)
+									if (Utils.validPort answer)
 										port = answer										
 										Printer.info "tip: Use comand \"get-ext-ip\" to get you external IP automatically\n"
 										rl.question "* Source IP, SIP layer (random): ", (answer) ->
@@ -582,9 +528,8 @@ runMenu = (shodanKey) ->
 				Printer.configure()
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
-					target = answer
-					# TODO: Change all these controls
-					if true
+					if (Utils.isIP answer)
+						target = answer
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -593,7 +538,7 @@ runMenu = (shodanKey) ->
 								port = portTransport transport
 								rl.question "* Port (#{port}): ", (answer) ->
 									answer = port if answer is ""
-									if (Grammar.portRE.exec answer)
+									if (Utils.validPort answer)
 										port = answer										
 										Printer.info "tip: Use comand \"get-ext-ip\" to get you external IP automatically\n"
 										rl.question "* Source IP, SIP layer (random): ", (answer) ->
@@ -632,9 +577,8 @@ runMenu = (shodanKey) ->
 				Printer.configure()
 				rl.question "* Target (#{target}): ", (answer) ->
 					answer = target if answer is ""
-					target = answer
-					# TODO: Change all these controls
-					if true
+					if (Utils.isIP answer)
+						target = answer
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -643,7 +587,7 @@ runMenu = (shodanKey) ->
 								port = portTransport transport
 								rl.question "* Port (#{port}): ", (answer) ->
 									answer = port if answer is ""
-									if (Grammar.portRE.exec answer)
+									if (Utils.validPort answer)
 										port = answer										
 										Printer.info "tip: Use comand \"get-ext-ip\" to get you external IP automatically\n"
 										rl.question "* Source IP, SIP layer (random): ", (answer) ->
@@ -679,8 +623,8 @@ runMenu = (shodanKey) ->
 				Printer.configure()
 				rl.question "* Target (127.0.0.1): ", (answer) ->
 					answer = "127.0.0.1" if answer is ""
-					target = answer
-					if true
+					if (Utils.isIP answer)
+						target = answer
 						Printer.info "opt:#{transportTypes}\n"
 						rl.question "* Transport (#{transport}): ", (answer) ->
 							answer = transport if answer is ""
@@ -689,7 +633,7 @@ runMenu = (shodanKey) ->
 								port = portTransport transport
 								rl.question "* Port (#{port}): ", (answer) ->
 									answer = port if answer is ""
-									if (Grammar.portRE.exec answer)
+									if (Utils.validPort answer)
 										port = answer
 										rl.question "* Delay between requests (ms.) (#{delay}): ", (answer) ->
 											answer = delay if answer is ""
@@ -728,25 +672,25 @@ runMenu = (shodanKey) ->
 				rl.question "* Target (#{targetWeb}): ", (answer) ->
 					answer = targetWeb if answer is ""
 					targetWeb = answer
-					if true
-						Printer.info "ie: quick, large\n"
-						rl.question "* Type (quick): ", (answer) ->
-							answer = "quick" if answer is ""
-							type = answer
-							if type in ["quick", "large"]
-								WebDiscover.run targetWeb, type
-							else
-								Printer.error "Bad Type"
-					else
-						Printer.error "Bad target"
+					Printer.info "ie: quick, large\n"
+					rl.question "* Type (quick): ", (answer) ->
+						answer = "quick" if answer is ""
+						type = answer
+						if type in ["quick", "large"]
+							WebDiscover.run targetWeb, type
+						else
+							Printer.error "Bad Type"
 			when "default-pass"
 				DefaultPass.print()
 			when "geo-locate"
 				Printer.configure()
 				rl.question "* Target (8.8.8.8): ", (answer) ->	
 					answer = "8.8.8.8" if answer is ""
-					ltarget = answer
-					MaxMind.locate ltarget
+					if (Utils.isIP answer)
+						ltarget = answer
+						MaxMind.locate ltarget
+					else
+						Printer.error "Bad target"	
 			when "get-ext-ip"
 				ExtIp.get()
 			when "clear"

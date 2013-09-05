@@ -20,21 +20,21 @@
 	"keywords" : ["security", "tool", "VoIP", "SIP"],
 	"homepage" : "https://github.com/jesusprubio/bluebox-ng",
 	"scripts": {
-		"start" : "coffee bluebox.coffee"
+		"start" : "node_modules/coffee-script/bin/coffee bluebox.coffee"
 	},
 	"dependencies" : {
-		"coffee-script" : "1.4.x",
-		"underscore" : "1.4.x",
-		"request" : "2.16.x",
-		"xml2js" : "0.2.x",
-		"geoip-lite" : "1.0.x",
-		"cli-color" : "0.2.x",
-		"events" : "0.5.x",
-		"websocket" : "1.0.x",
-		"wget" : "0.0.x",
-		"evilscan" : "0.0.x"
+		"coffee-script" : "x",
+		"underscore" : "x",
+		"request" : "x",
+		"xml2js" : "x",
+		"geoip-lite" : "x",
+		"cli-color" : "x",
+		"events" : "x",
+		"websocket" : "x",
+		"wget" : "x",
+		"evilscan" : "x"
 	},
 	"engines": {
-		"node": "0.11.x"
+		"node": "0.10.x"
 	}
 }

@@ -28,17 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # This class includes all regular expressions.
 exports.Grammar =
 class Grammar
-	
-	# IP address.
-	#@ipRE = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/
-	#@ipRE6 = /(\d{0,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/i
-	
-	# IP address range. (ie: 192.168.122.1-192.168.122.254)
-	@ipRangeRE = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})-(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/
-
-
-	# IP address range. ( ie: 192.168.122.1-254)
-	@ipRangeRE2 = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})-(\d{1,3})/
 
 	# Service version.
 	@versionRE = /(\d{1,2}(\.\d{1,2})?(\.\d{1,2}})?)/

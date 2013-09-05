@@ -45,6 +45,9 @@ class Utils
 	
 	@isIP6 = net.isIPv6
 	
+	@validPort = (port) ->
+		0 < parseInt(port,10) < 65535
+
 	@randomNumber = undScore.random
 	
 	# Random IP (v4) address generator.
@@ -67,11 +70,8 @@ class Utils
 	@randomPort2 = () ->
 		@randomNumber 6000, 65535
 		
-		
 	# It tests if passed object is a number.
-	@isNumber = (num) ->
-		undScore.isNumber num
-		
+	@isNumber = undScore.isNumber
 	
 	# It changes SHODAN key in options.json file.
 	@changeJsonKey = (shodanKey) ->

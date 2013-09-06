@@ -1,6 +1,6 @@
 {
 	"name" : "Bluebox-ng",
-	"version" : "0.1.0",
+	"version" : "0.0.0",
 	"description" : "A next generation VoIP security tool. It has been written in CoffeeScript using Node.js powers.",
 	"author" : { 
 		"name" : "Jesus Perez <@jesusprubio>",

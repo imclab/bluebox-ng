@@ -43,6 +43,7 @@ fs = require "fs"
 {DumbFuzz} = require "./src/modules/dumbFuzz"
 {BashCommand} = require "./src/modules/bashCommand"
 {NetworkScan} = require "./src/modules/networkScan"
+{ExploitSearch} = require "./src/modules/exploitSearch"
 
 # --------------------- Functions --------------------------------
 
@@ -108,15 +109,17 @@ printCommands = () ->
 #	Printer.normal "Bruteforce credentials of a VoIP server web panel.\n"
 	Printer.infoHigh "\nMORE\n"
 	Printer.highlight "network-scan: "
-	Printer.normal "Host/port scanning (Evilscan)"
+	Printer.normal "Host/port scanning (Evilscan).\n"
 	Printer.highlight "shodan-host: "
 	Printer.normal "Get indexed info of an IP address in SHODAN.\n"
 	Printer.highlight "shodan-vulns': "
-	Printer.normal "Find vulnerabilities and exploit of an specifig service version.\n"
+	Printer.normal "Find vulnerabilities and exploit for an specifig service version (using SHODAN API).\n"
 	Printer.highlight "shodan-query: "
 	Printer.normal "Use a customized SHODAN VoIP query.\n"
 	Printer.highlight "shodan-download: "
 	Printer.normal "Download an exploit.\n"
+	Printer.highlight "search-vulns: "
+	Printer.normal "Find vulnerabilities and exploit for an specifig service version (using exploitsearch.net API).\n"
 	Printer.highlight "default-pass: "
 	Printer.normal "Show common VoIP system default passwords.\n"
 	Printer.highlight "geo-locate: "
@@ -140,7 +143,7 @@ completer = (line) ->
 	completions += "sip-dns sip-scan sip-brute-ext sip-brute-ext-ast sip-brute-pass "
 	completions += "sip-unauth sip-unreg "
 	completions += "sip-bye sip-flood dumb-fuzz "
-	completions += "web-discover network-scan "
+	completions += "web-discover network-scan search-vulns "
 	completions += "shodan-host shodan-vulns shodan-query shodan-download default-pass "
 	completions += "geo-locate get-ext-ip clear help version quit exit"
 	completSplit = completions.split " "
@@ -156,7 +159,7 @@ runMenu = (shodanKey) ->
 	rl.prompt()
 
 	# Default parameters.
-	version = "Alpha (0.0.1)"
+	version = ""
 	target = "0.0.0.0"
 	transportTypes= ["UDP", "TCP", "TLS", "WS", "WSS"]
 	transport = "UDP"
@@ -187,6 +190,20 @@ runMenu = (shodanKey) ->
 	# On new line, it's parsed and related module is launched with chosen params.
 	rl.on "line", (line) ->
 		switch line.trim()
+			when "search-vulns"
+				Printer.configure()
+				rl.question "* Service (FreePBX): ", (answer) ->
+					answer = "freepbx" if answer is ""
+					service = answer
+					rl.question "* Version (None): ", (answer) ->
+						version = answer
+						Printer.info "ie: yes/no\n"
+						rl.question "* Search for exploits only (no): ", (answer) ->
+							if answer is ""
+								lonly = "no"
+							else
+								lonly = answer
+							ExploitSearch.search service, version, lonly
 			when "network-scan"
 				Printer.configure()
 				Printer.info "ie: 192.168.122.1, 192.168.122.0/24\n"
@@ -312,9 +329,9 @@ runMenu = (shodanKey) ->
 															Printer.info "tip: Final format \"ws:\\Target:Port:Path\"\n"
 															rl.question "* Path (#{path}): ", (answer) ->
 																path = answer
-																SipScan.run target, port, path, srcHost, transport, rtype, shodanKey, delay
+																SipScan.run target, port, path, srcHost, transport, rtype, delay
 														else
-															SipScan.run target, port, "", srcHost, transport, rtype, shodanKey, delay
+															SipScan.run target, port, "", srcHost, transport, rtype, delay
 												else
 													Printer.error "Invalid type"		
 									else

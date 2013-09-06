@@ -35,4 +35,5 @@ Thanks to ...
 - [mediko](https://github.com/medikoo/cli-color), developers of cli-color
 - [bmatzelle](https://github.com/bmatzelle), Gow developer 
 - [eviltik](https://github.com/eviltik/evilscan), Evilscan port scanner creator
+- Tom Steele ([@_tomsteele](https://twitter.com/_tomsteele)) and Dan Kottmann ([@djkottmann](https://twitter.com/djkottmann)), owners of [exploitsearch.net](http://www.exploitsearch.net/) site.
 - All VoIP, free software and security hackers that we read everyday

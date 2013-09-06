@@ -148,7 +148,6 @@ class Shodan
 		query += "+#{version}" if version
 		query += "+port%3A#{port}" if port
 		query += "+country%3A#{country}" if country
-		# console.log "QUERY: #{query}"
 		@searchQuery query, pages, key
 
 

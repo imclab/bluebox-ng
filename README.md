@@ -1,6 +1,6 @@
 Bluebox-ng
 ==========
-Bluebox-ng is a next generation UC/VoIP security tool. It has been written in CoffeeScript using Node.js powers. This project is "our 2 cents" to help to improve information security practices in VoIP/UC environments.
+Bluebox-ng is an open-source VoIP/UC vulnerability scanner. It has been written in CoffeeScript using Node.js powers. This project is "our 2 cents" to help to improve information security practices in this kind of environments.
 
 - **GitHub repo**: [https://github.com/jesusprubio/bluebox-ng](https://github.com/jesusprubio/bluebox-ng)
 - **IRC(Freenode)**: #breakingVoIP
@@ -26,32 +26,28 @@ Install
 - *setup.sh*
 - *bluebox.sh*
 
-Note: There are two warnings related with WebSocket-Node module. For the moment we prefer do not compile native extensions to avoid compatibility problems. Feel free to compile by yourself following [offical documentation](https://github.com/Worlize/WebSocket-Node).
- - Warning: Native modules not compiled.  XOR performance will be degraded
- - Warning: Native modules not compiled.  UTF-8 validation disabled
-
 
 Issues
 ------------
-- This is an Alpha version, so some know bugs are described here: [https://github.com/jesusprubio/bluebox-ng/issues](https://github.com/jesusprubio/bluebox-ng/issues)
+- This is an Beta version, so some know bugs are described here: [https://github.com/jesusprubio/bluebox-ng/issues](https://github.com/jesusprubio/bluebox-ng/issues)
 - If you have doubts playing with the software, please use this GitHub section labeling the issue as "question"
 
 
-Features (Alpha)
-----------------
+Features
+--------
 - RFC compliant
 - TLS and IPv6 support
 - SIP over websockets (and WSS) support (draft-ietf-sipcore-sip-websocket-08)
-- SHODAN and Google Dorks
+- SHODAN, exploitsearch.net and Google Dorks
 - SIP common security tools (scan, extension/password bruteforce, etc.)
 - REGISTER, OPTIONS, INVITE, MESSAGE, SUBSCRIBE, PUBLISH, OK, ACK, CANCEL, BYE and Ringing requests support
-- Authentication through different types of requests.
+- Authentication through different types of requests
 - SIP denial of service (DoS) testing
 - SRV and NAPTR discovery
 - Dumb fuzzing
 - Common VoIP servers web management panels discovery
 - Automatic exploit searching (Exploit DB, PacketStorm, Metasploit)
-- Automatic vulnerability searching (CVE, OSVDB)
+- Automatic vulnerability searching (CVE, OSVDB, NVD)
 - Geolocation
 - Colored output
 - Command completion

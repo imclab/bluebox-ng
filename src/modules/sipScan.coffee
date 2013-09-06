@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {Parser} = require "../tools/parser.coffee"
 {Printer} = require "../tools/printer.coffee"
 {Utils} = require "../tools/utils.coffee"
-{Shodan} = require "./shodan"
+{ExploitSearch} = require "./exploitSearch"
 {MaxMind} = require "./maxMind"
 {Grammar} = require "../tools/grammar"
 {EventEmitter} = require "events"
@@ -79,7 +79,7 @@ class SipScan extends EventEmitter
 		return {service: ser, version: ver, message: msg}
 
 
-	oneScan = (target, port, path, srcHost, transport, type, shodanKey, isRange) ->
+	oneScan = (target, port, path, srcHost, transport, type, isRange) ->
 		lport = Utils.randomPort()
 
 		msgObj = new SipMessage type, "", target, port, srcHost, lport, "", "", transport, "", "", "", false, "", "", "", "", "", ""
@@ -97,9 +97,8 @@ class SipScan extends EventEmitter
 				MaxMind.locate target
 				if output.service
 					printCveDetails output.service
-					if shodanKey isnt ""
-						Printer.infoHigh "\nVULNERABILITIES AND EXPLOITS =>\n\n"
-						Shodan.searchVulns output.service, output.version, shodanKey
+					Printer.infoHigh "\nVULNERABILITIES AND EXPLOITS =>\n"
+					ExploitSearch.search output.service, output.version
 
 		conn.on "error", (error) ->
 			# If we're not scanning a range we want to show possible errors.
@@ -113,7 +112,7 @@ class SipScan extends EventEmitter
 			Printer.removeCursor()
 
 	# It walks through different ports.
-	scan = (target, port, path, srcHost, transport, type, shodanKey, delay, isRange) =>
+	scan = (target, port, path, srcHost, transport, type, delay, isRange) =>
 
 		# ie: 5000-6000
 		if /-/.exec port
@@ -123,7 +122,7 @@ class SipScan extends EventEmitter
 
 			doLoopNum = (i) =>
 				setTimeout(=>
-					oneScan target, i, path, srcHost, transport, type, "", true
+					oneScan target, i, path, srcHost, transport, type, true
 					if parseInt(i, 10) < parseInt(lastPort, 10)
 						doLoopNum(parseInt(i, 10) + 1)
 					else
@@ -136,7 +135,7 @@ class SipScan extends EventEmitter
 				portsList = port.split ","
 				doLoopString = (i) =>
 					setTimeout(=>
-						oneScan target, portsList[i], path, srcHost, transport, type, "", true
+						oneScan target, portsList[i], path, srcHost, transport, type, true
 						if i < portsList.length - 1
 							doLoopString(parseInt(i, 10) + 1)
 						else
@@ -146,12 +145,12 @@ class SipScan extends EventEmitter
 			# Unique port.
 			else
 				isRange if isRange
-				oneScan target, port, path, srcHost, transport, type, shodanKey, isRange
+				oneScan target, port, path, srcHost, transport, type, isRange
 				@emitter.emit "portBlockEnd", "Block of ports ended"
 
 
 
-	@run = (target, port, path, srcHost, transport, type, shodanKey, delay) ->
+	@run = (target, port, path, srcHost, transport, type, delay) ->
 
 		Printer.normal "\n"
 		# IP range.
@@ -184,12 +183,12 @@ class SipScan extends EventEmitter
 					if i < parseInt(lastBlock, raddix)
 						i += 1
 						targetI = "#{netBlocks}#{blockSeparator}#{i.toString(raddix)}"
-						scan targetI, port, path, srcHost, transport, type, "", delay, true
+						scan targetI, port, path, srcHost, transport, type, delay, true
 				), delay
 
 			# First request
 			targetI = "#{netBlocks}#{blockSeparator}#{i.toString(raddix)}"
-			scan targetI, port, path, srcHost, transport, type, "", delay, true
+			scan targetI, port, path, srcHost, transport, type, delay, true
 
 		else
 			# File with targets.
@@ -205,14 +204,14 @@ class SipScan extends EventEmitter
 							setTimeout (=>
 								if i < (splitData.length - 1)
 									i += 1
-									scan splitData[i], port, path, srcHost, transport, type, "", delay, true
+									scan splitData[i], port, path, srcHost, transport, type, delay, true
 							), delay
 
 						# First request
-						scan splitData[i], port, path, srcHost, transport, type, "", delay. true
+						scan splitData[i], port, path, srcHost, transport, type, delay. true
 			# Unique target.
 			else
 				# Needed to work with Node module net.isIPv6 function.
 				if (/:/.test target)
 					target = Utils.normalize6 target
-				scan target, port, path, srcHost, transport, type, shodanKey, delay, false
+				scan target, port, path, srcHost, transport, type, delay, false

@@ -87,7 +87,7 @@ class Printer
 
 
 	@welcome = () ->
-		data = clc.bold "\n\tWelcome to Bluebox-ng (v. 0.1.0 - Alpha)\n\n"
+		data = clc.bold "\n\tWelcome to Bluebox-ng (v. beta)\n\n"
 		process.stdout.write data
 		
 	

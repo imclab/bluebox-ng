@@ -140,7 +140,7 @@ class SipBrutePass extends EventEmitter
 		if (/:/.test target)
 			target = Utils.normalize6 target
 		# Extension or range.
-		# Range.			
+		# Range.
 		if (Grammar.extRangeRE.exec extensions)
 			rangeExtParsed = Parser.parseExtRange extensions
 			i = parseInt(rangeExtParsed.minExt, 10)

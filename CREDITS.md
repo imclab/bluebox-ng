@@ -29,11 +29,5 @@ Thanks to ...
 - David Endler and Mark Collier ([@markcollier46](https://twitter.com/markcollier46)), authors of "Hacking VoIP Exposed" book
 (http://www.hackingvoip.com/)
 - John Matherly ([@achillean](https://twitter.com/achillean)) for SHODAN API and GHDB
-- [sha0coder](https://twitter.com/sha0coder), author of dirscan-node
-- [Worlize guys](https://github.com/Worlize), developers of used Node.js websockets implementation
-- [wuchengwe](https://github.com/wuchengwei/node-wget), developers of node-wget
-- [mediko](https://github.com/medikoo/cli-color), developers of cli-color
-- [bmatzelle](https://github.com/bmatzelle), Gow developer 
-- [eviltik](https://github.com/eviltik/evilscan), Evilscan port scanner creator
 - Tom Steele ([@_tomsteele](https://twitter.com/_tomsteele)) and Dan Kottmann ([@djkottmann](https://twitter.com/djkottmann)), owners of [exploitsearch.net](http://www.exploitsearch.net/) site.
 - All VoIP, free software and security hackers that we read everyday

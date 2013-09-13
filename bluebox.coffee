@@ -35,7 +35,7 @@ fs = require "fs"
 {MaxMind} = require "./src/modules/maxMind"
 {DefaultPass} = require "./src/modules/defaultPass"
 {GoogleDorks} = require "./src/modules/googleDorks"
-{WebDiscover} = require "./src/modules/webDiscover"
+{HttpDiscover} = require "./src/modules/httpDiscover"
 {SipFlood} = require "./src/modules/sipFlood"
 {SipUnAuth} = require "./src/modules/sipUnAuth"
 {SipUnreg} = require "./src/modules/sipUnreg"
@@ -44,6 +44,7 @@ fs = require "fs"
 {BashCommand} = require "./src/modules/bashCommand"
 {NetworkScan} = require "./src/modules/networkScan"
 {ExploitSearch} = require "./src/modules/exploitSearch"
+{ExternalBrute} = require "./src/modules/externalBrute"
 
 # --------------------- Functions --------------------------------
 
@@ -100,14 +101,11 @@ printCommands = () ->
 	Printer.normal "Denial of service (DoS) protection mechanism stress test.\n"
 	Printer.highlight "dumb-fuzz: "
 	Printer.normal "Really stupid fuzzer.\n"
-	Printer.infoHigh "\nWEB\n"
-#	Printer.highlight "web-auto: "
-#	Printer.normal "Discover and bruteforce common web panel of VoIP servers in a host.\n"
-	Printer.highlight "web-discover: "
-	Printer.normal "Discover common web panel of a VoIP servers in a host (Dirscan-node).\n"
-#	Printer.highlight "web-brute: "
-#	Printer.normal "Bruteforce credentials of a VoIP server web panel.\n"
 	Printer.infoHigh "\nMORE\n"
+	Printer.highlight "ami-brute: "
+	Printer.normal "Try to brute-force valid credentials for Asterisk AMI service.\n"
+	Printer.highlight "http-discover: "
+	Printer.normal "Discover common web panel of a VoIP servers in a host (Dirscan-node).\n"
 	Printer.highlight "network-scan: "
 	Printer.normal "Host/port scanning (Evilscan).\n"
 	Printer.highlight "shodan-host: "
@@ -143,7 +141,7 @@ completer = (line) ->
 	completions += "sip-dns sip-scan sip-brute-ext sip-brute-ext-ast sip-brute-pass "
 	completions += "sip-unauth sip-unreg "
 	completions += "sip-bye sip-flood dumb-fuzz "
-	completions += "web-discover network-scan search-vulns "
+	completions += "ami-brute http-discover network-scan search-vulns "
 	completions += "shodan-host shodan-vulns shodan-query shodan-download default-pass "
 	completions += "geo-locate get-ext-ip clear help version quit exit"
 	completSplit = completions.split " "
@@ -219,8 +217,8 @@ runMenu = (shodanKey) ->
 								# transport = answer
 						Printer.info "ie: 80\n"
 						Printer.info "ie: 21,22,23,5060-5070\n"
-						rl.question "* Ports (21,22,23,80,443,4443,4444,5060-5070,8080): ", (answer) ->
-							answer = "21,22,23,80,443,4443,4444,5060-5070,8080" if answer is ""
+						rl.question "* Ports (21,22,23,80,443,4443,4444,5038,5060-5070,8080): ", (answer) ->
+							answer = "21,22,23,80,443,4443,4444,5038,5060-5070,8080" if answer is ""
 							if (Utils.validPort answer)
 								port = answer
 								NetworkScan.run target, port
@@ -683,7 +681,34 @@ runMenu = (shodanKey) ->
 										Printer.error "Bad port"
 					else
 						Printer.error "Bad target"
-			when "web-discover"
+			when "ami-brute"
+				Printer.configure()
+				Printer.info "ie: 192.168.122.1\n"
+				rl.question "* Target (#{target}): ", (answer) ->
+					answer = target if answer is ""
+					if (Utils.isIP answer)
+						target = answer
+						rl.question "* Port (5038): ", (answer) ->
+							answer = "5038" if answer is ""
+							if (Utils.validPort answer)
+								port = answer
+								Printer.info "ie: \"admin\", \"./data/john.txt\"\n"
+								rl.question "* Enter an user or a file (admin): ", (answer) ->
+									answer = "admin" if not answer
+									onlyExt = answer
+									Printer.info "ie: \"admin\", \"./data/john.txt\"\n"
+									rl.question "* Enter an password or a file (admin): ", (answer) ->
+										answer = "admin" if not answer
+										passwords = answer
+										rl.question "* Delay between requests (ms.) (#{delay}): ", (answer) ->
+											answer = delay if answer is ""
+											delay = answer
+											ExternalBrute.run target, port, onlyExt, delay, passwords, "ami"
+							else
+								Printer.error "Invalid port"
+					else
+						Printer.error "Invalid target"
+			when "http-discover"
 				Printer.configure()
 				Printer.info "ie: 192.168.122.135, http://192.168.122.135, http://anydomain.com, https://anydomain.com\n"
 				rl.question "* Target (#{targetWeb}): ", (answer) ->
@@ -694,7 +719,7 @@ runMenu = (shodanKey) ->
 						answer = "quick" if answer is ""
 						type = answer
 						if type in ["quick", "large"]
-							WebDiscover.run targetWeb, type
+							HttpDiscover.run targetWeb, type
 						else
 							Printer.error "Bad Type"
 			when "default-pass"

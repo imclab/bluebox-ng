@@ -32,7 +32,8 @@
 		"events" : "x",
 		"websocket" : "x",
 		"wget" : "x",
-		"evilscan" : "x"
+		"evilscan" : "x",
+        "asterisk-manager" : "x"
 	},
 	"engines": {
 		"node": "0.10.x"

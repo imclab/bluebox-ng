@@ -27,8 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------- Class ----------------------------------
 
 # This class uses dirscan-node tool to brute-force web directories.
-exports.WebDiscover =
-class WebDiscover
+exports.HttpDiscover =
+class HttpDiscover
 
 	@run = (url, type) ->
 		basePath = "external/dirscan-node/wordlists/"

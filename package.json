@@ -33,7 +33,8 @@
 		"websocket" : "x",
 		"wget" : "x",
 		"evilscan" : "x",
-        "asterisk-manager" : "x"
+        "asterisk-manager" : "x",
+        "mysql" : "x"
 	},
 	"engines": {
 		"node": "0.10.x"

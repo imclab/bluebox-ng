@@ -10,12 +10,13 @@ src/modules/private/*
 # Custon options
 options.json
 
+
 # .js stuff
 *.js
 /src/modules/*.js
 /src/tools/*.js
 .jshintrc
-
+.coffeehintrc
 
 # OS files
 .DS_Store

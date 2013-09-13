@@ -34,7 +34,8 @@
 		"wget" : "x",
 		"evilscan" : "x",
         "asterisk-manager" : "x",
-        "mysql" : "x"
+        "mysql" : "x",
+        "ssh2" : "x"
 	},
 	"engines": {
 		"node": "0.10.x"

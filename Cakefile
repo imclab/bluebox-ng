@@ -7,6 +7,6 @@ task "clean", "Clean the environment.", ->
 		console.log stdout + stderr
 		console.log "All .js files were removed."
 	exec "rm -rf node_modules", (err, stdout, stderr) ->
-		throw err if err
+		throw err if err.configure
 		console.log stdout + stderr
 		console.log "node_modules folder was removed."

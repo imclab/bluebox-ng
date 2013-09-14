@@ -110,6 +110,8 @@ printCommands = () ->
 	Printer.normal "Try to brute-force valid credentials for a SSH server.\n"
 	Printer.highlight "sftp-brute: "
 	Printer.normal "Try to brute-force valid credentials for a FTP/SFTP server.\n"
+	Printer.highlight "http-brute: "
+	Printer.normal "Try to brute-force valid credentials for an HTTP server.\n"	
 	Printer.highlight "http-discover: "
 	Printer.normal "Discover common web panel of a VoIP servers in a host (Dirscan-node).\n"
 	Printer.highlight "network-scan: "
@@ -174,7 +176,7 @@ runMenu = (shodanKey) ->
 	# TODO: Available: 4 (ipv4), 6 (ipv6).
 	# ipVersion = 4
 	# Delay between requests (in ms.).
-	delay = 100
+	delay = 1000
 	rangeExt = "100-999"
 	onlyExt = "100"
 	onlyExtTo = "bluebox"
@@ -795,6 +797,24 @@ runMenu = (shodanKey) ->
 								Printer.error "Invalid port"
 					else
 						Printer.error "Invalid target"
+			when "http-brute"
+				Printer.configure()
+				Printer.info "ie: http://192.168.122.1, http://localhost:6767/test/\n"
+				rl.question "* Target (http://127.0.0.1): ", (answer) ->
+					answer = "http://127.0.0.1" if answer is ""
+					target = answer
+					Printer.info "ie: \"admin\", \"./data/john.txt\"\n"
+					rl.question "* Enter an user or a file (admin): ", (answer) ->
+						answer = "admin" if not answer
+						onlyExt = answer
+						Printer.info "ie: \"god\", \"./data/john.txt\"\n"
+						rl.question "* Enter an password or a file (admin): ", (answer) ->
+							answer = "admin" if not answer
+							passwords = answer
+							rl.question "* Delay between requests (ms.) (#{delay}): ", (answer) ->
+								answer = delay if answer is ""
+								delay = answer
+								ExternalBrute.run target, "", onlyExt, delay, passwords, "http"
 			when "http-discover"
 				Printer.configure()
 				Printer.info "ie: 192.168.122.135, http://192.168.122.135, http://anydomain.com, https://anydomain.com\n"

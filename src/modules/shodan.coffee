@@ -97,6 +97,7 @@ class Shodan
 
 	# It looks for known vulnerabilities for an specific service version
 	@searchVulns = (service, version, key) ->
+		# TODO: Use timeout param of request instead of this tricky one
 		setTimeout callback, timeOut
 		# We use request library to get a JSON file and parse it
 		#console.log "#{baseUrl}search_exploits?q=#{service}+#{version}&key=#{key}"

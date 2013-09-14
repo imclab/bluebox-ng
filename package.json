@@ -35,7 +35,8 @@
 		"evilscan" : "x",
         "asterisk-manager" : "x",
         "mysql" : "x",
-        "ssh2" : "x"
+        "ssh2" : "x",
+        "jsftp" : "x"
 	},
 	"engines": {
 		"node": "0.10.x"

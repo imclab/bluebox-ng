@@ -37,7 +37,7 @@ class ExternalBrute extends EventEmitter
 
 	@emitter = new EventEmitter
 	# Time to wait for a response.
-	timeOut = 1000
+	timeOut = 3000
 	
 	printBrutePass = (user, pass) ->
 		Printer.info "\nPassword found (user "
@@ -53,6 +53,7 @@ class ExternalBrute extends EventEmitter
 				callback = () =>
 					if (isValid and isConnected)
 						printBrutePass testUser, testPass
+						return
 
 				setTimeout callback, timeOut
 				ami = require("asterisk-manager")(port, target, testUser, testPass, true)
@@ -95,6 +96,7 @@ class ExternalBrute extends EventEmitter
 					else
 						connection.end()
 						printBrutePass testUser, testPass
+						return
 			when "ssh"
 				ssh = require "ssh2"
 				c = new ssh()
@@ -105,6 +107,7 @@ class ExternalBrute extends EventEmitter
 
 				c.on "ready", ->
 					printBrutePass testUser, testPass
+					return
 
 				c.on "error", (err) ->
 					if /Authentication failure/.exec err
@@ -124,7 +127,8 @@ class ExternalBrute extends EventEmitter
 				setTimeout callback, timeOut
 				c.connect sshO
 			when "sftp"
-				JSFtp = require("jsftp")
+				JSFtp = require "jsftp"
+				isConnected = false
 				ftpO =
 					host: target
 					port: parseInt port,10 # defaults to 21
@@ -132,7 +136,16 @@ class ExternalBrute extends EventEmitter
 					pass: testPass # defaults to "@anonymous"
 				Ftp = new JSFtp(ftpO)
 
+				Ftp.on "error", (err) ->
+							Printer.error "ExternalBrute: Connection problem #{err}"					
+
+				callback = () =>
+					if not isConnected
+						Printer.error "ExternalBrute: Connection problem"
+
+				setTimeout callback, timeOut
 				Ftp.auth ftpO.user, ftpO.pass, (err) ->
+					isConnected = true
 					if err
 						if /Login not accepted/.exec err
 							Printer.highlight "Last tested combination "
@@ -142,6 +155,28 @@ class ExternalBrute extends EventEmitter
 							Printer.error "ExternalBrute: Connection problem #{err}"
 					else
 						printBrutePass testUser, testPass
+						return
+			when "http"
+				request = require "request"
+
+				authO =
+					user: testUser
+					pass: testPass
+					sendImmediately: false
+
+				request.get uri: target, auth: authO, timeout: timeOut ,  (err, r, body) ->
+					if err
+						Printer.error "ExternalBrute: connection problem: #{err}"
+					else
+						if body.error
+							Printer.error "ExternalBrute: problem parsing HTML body #{body.error}"
+						else
+							if /401 Authorization Required/.exec body
+								Printer.highlight "Last tested combination "
+								Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
+								Printer.removeCursor()
+							else
+								printBrutePass testUser, testPass
 
 	brute = (target, port, testUser, passwords, delay, type) =>
 		# File with passwords is provided.

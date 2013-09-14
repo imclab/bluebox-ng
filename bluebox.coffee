@@ -108,6 +108,8 @@ printCommands = () ->
 	Printer.normal "Try to brute-force valid credentials for a DB (MySQL).\n"
 	Printer.highlight "ssh-brute: "
 	Printer.normal "Try to brute-force valid credentials for a SSH server.\n"
+	Printer.highlight "sftp-brute: "
+	Printer.normal "Try to brute-force valid credentials for a FTP/SFTP server.\n"
 	Printer.highlight "http-discover: "
 	Printer.normal "Discover common web panel of a VoIP servers in a host (Dirscan-node).\n"
 	Printer.highlight "network-scan: "
@@ -143,9 +145,9 @@ printCommands = () ->
 completer = (line) ->
 	completions = "\nall-auto shodan-search shodan-pop google-dorks "
 	completions += "sip-dns sip-scan sip-brute-ext sip-brute-ext-ast sip-brute-pass "
-	completions += "sip-unauth sip-unreg "
-	completions += "sip-bye sip-flood dumb-fuzz "
-	completions += "ami-brute db-brute ssh-brute http-brute http-discover network-scan search-vulns "
+	completions += "sip-unauth sip-unreg sip-bye sip-flood "
+	completions += "dumb-fuzz ami-brute db-brute ssh-brute "
+	completions += "sftp-brute http-brute http-discover network-scan search-vulns "
 	completions += "shodan-host shodan-vulns shodan-query shodan-download default-pass "
 	completions += "geo-locate get-ext-ip clear help version quit exit"
 	completSplit = completions.split " "
@@ -762,6 +764,33 @@ runMenu = (shodanKey) ->
 											answer = delay if answer is ""
 											delay = answer
 											ExternalBrute.run target, lport, onlyExt, delay, passwords, "ssh"
+							else
+								Printer.error "Invalid port"
+					else
+						Printer.error "Invalid target"
+			when "sftp-brute"
+				Printer.configure()
+				Printer.info "ie: 192.168.122.1\n"
+				rl.question "* Target (#{target}): ", (answer) ->
+					answer = target if answer is ""
+					if (Utils.isIP answer)
+						target = answer
+						rl.question "* Port (21): ", (answer) ->
+							answer = "21" if answer is ""
+							if (Utils.validPort answer)
+								lport = answer
+								Printer.info "ie: \"admin\", \"./data/john.txt\"\n"
+								rl.question "* Enter an user or a file (anonymous): ", (answer) ->
+									answer = "anonymous" if not answer
+									onlyExt = answer
+									Printer.info "ie: \"god\", \"./data/john.txt\"\n"
+									rl.question "* Enter an password or a file (anonymous): ", (answer) ->
+										answer = "anonymous" if not answer
+										passwords = answer
+										rl.question "* Delay between requests (ms.) (#{delay}): ", (answer) ->
+											answer = delay if answer is ""
+											delay = answer
+											ExternalBrute.run target, lport, onlyExt, delay, passwords, "sftp"
 							else
 								Printer.error "Invalid port"
 					else

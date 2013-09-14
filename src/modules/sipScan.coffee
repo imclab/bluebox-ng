@@ -41,7 +41,7 @@ class SipScan extends EventEmitter
 
 	@emitter = new EventEmitter
 
-	printScanInfo = (info) ->
+	printScanInfo = (info, hasAuth) ->
 		Printer.infoHigh "\n\nFINGERPRINT =>\n"
 		Printer.info "\nService: "
 		Printer.result info.service
@@ -49,15 +49,19 @@ class SipScan extends EventEmitter
 		Printer.result info.version
 		Printer.info "\nMessage:\n"
 		Printer.normal info.message
-		
+		Printer.infoHigh "\n\nAUTHENTICATION =>\n"
+		Printer.highlight "\n#{hasAuth}\n"
 
-	printScanInfoLite = (info, target) ->
+
+	printScanInfoLite = (info, target, hasAuth) ->
 		Printer.info "\nIP address: "
 		Printer.result target
 		Printer.info ", Service: "
 		Printer.result info.service
 		Printer.info ", Version: "
 		Printer.result info.version
+		Printer.info ", Auth: "
+		Printer.result hasAuth
 		Printer.info ", Message:\n"
 		Printer.normal info.message
 
@@ -89,10 +93,14 @@ class SipScan extends EventEmitter
 
 		conn.on "newMessage", (stream) ->
 			output = getFingerPrint stream
+			sipCode = Parser.parseCode stream
+			hasAuth = false
+			if sipCode in ["401", "407"]
+				hasAuth = true
 			if isRange
-				printScanInfoLite(output, target) if output.message
+				printScanInfoLite(output, target, hasAuth) if output.message
 			else
-				printScanInfo output if output
+				printScanInfo output, hasAuth if output
 				Printer.infoHigh "\nGEOLOCATION =>\n"
 				MaxMind.locate target
 				if output.service

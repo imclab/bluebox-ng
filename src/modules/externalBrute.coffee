@@ -97,6 +97,19 @@ class ExternalBrute extends EventEmitter
 						connection.end()
 						printBrutePass testUser, testPass
 						return
+			when "mongo"
+				MongoClient = require("mongodb").MongoClient
+				MongoClient.connect "mongodb://#{testUser}:#{testPass}@#{target}:#{port}", (err, result) ->
+					if err
+						if /auth fails/.exec err
+							Printer.highlight "Last tested combination "
+							Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
+							Printer.removeCursor()
+						else
+							Printer.error "ExternalBrute: Connection problem #{err}"
+					else
+						printBrutePass testUser, testPass
+						return
 			when "ssh"
 				ssh = require "ssh2"
 				c = new ssh()

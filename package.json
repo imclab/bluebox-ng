@@ -36,7 +36,8 @@
         "asterisk-manager" : "x",
         "mysql" : "x",
         "ssh2" : "x",
-        "jsftp" : "x"
+        "jsftp" : "x",
+        "mongodb" : "x"
 	},
 	"engines": {
 		"node": "0.10.x"

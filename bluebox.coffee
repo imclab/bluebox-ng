@@ -723,24 +723,32 @@ runMenu = (shodanKey) ->
 					answer = target if answer is ""
 					if (Utils.isIP answer)
 						target = answer
-						rl.question "* Port (3306): ", (answer) ->
-							answer = "3306" if answer is ""
-							if (Utils.validPort answer)
-								lport = answer
-								Printer.info "ie: \"admin\", \"./data/john.txt\"\n"
-								rl.question "* Enter an user or a file (root): ", (answer) ->
-									answer = "root" if not answer
-									onlyExt = answer
-									Printer.info "ie: \"root\", \"./data/john.txt\"\n"
-									rl.question "* Enter an password or a file (root): ", (answer) ->
-										answer = "root" if not answer
-										passwords = answer
-										rl.question "* Delay between requests (ms.) (#{delay}): ", (answer) ->
-											answer = delay if answer is ""
-											delay = answer
-											ExternalBrute.run target, lport, onlyExt, delay, passwords, ltype
+						Printer.info "opt: \"mysql\", \"mongo\"\n"
+						rl.question "* Select a DB engine (mysql): ", (answer) ->
+							answer = "mysql" if not answer
+							if answer in ["mysql", "mongo"]
+								ltype = answer
+								lport = "3306"
+								lport = "27017" if ltype is "mongo"
+								rl.question "* Port (#{lport}): ", (answer) ->
+									answer = lport if answer is ""
+									if (Utils.validPort answer)
+										lport = answer
+										Printer.info "ie: \"admin\", \"./data/john.txt\"\n"
+										rl.question "* Enter an user or a file (root): ", (answer) ->
+											answer = "root" if not answer
+											onlyExt = answer
+											rl.question "* Enter an password or a file (root): ", (answer) ->
+												answer = "root" if not answer
+												passwords = answer										
+												rl.question "* Delay between requests (ms.) (#{delay}): ", (answer) ->
+													answer = delay if answer is ""
+													delay = answer
+													ExternalBrute.run target, lport, onlyExt, delay, passwords, ltype
+									else
+										Printer.error "Invalid port"
 							else
-								Printer.error "Invalid port"
+								Printer.error "Invalid DB engine"
 					else
 						Printer.error "Invalid target"
 			when "ssh-brute"

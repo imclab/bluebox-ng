@@ -119,7 +119,7 @@ class ExternalBrute extends EventEmitter
 										else
 											printBrutePass testUser, testPass
 							else
-								Printer.highlight "The server is not using authentication\n"
+								Printer.highlight "The server is NOT using authentication\n"
 			when "ssh"
 				ssh = require "ssh2"
 				c = new ssh()
@@ -185,7 +185,7 @@ class ExternalBrute extends EventEmitter
 					pass: testPass
 					sendImmediately: false
 
-				request.get uri: target, auth: authO, timeout: timeOut ,  (err, r, body) ->
+				request.get uri: target, timeout: timeOut ,  (err, r, body) ->
 					if err
 						Printer.error "ExternalBrute: connection problem: #{err}"
 					else
@@ -193,11 +193,23 @@ class ExternalBrute extends EventEmitter
 							Printer.error "ExternalBrute: problem parsing HTML body #{body.error}"
 						else
 							if /401 Authorization Required/.exec body
-								Printer.highlight "Last tested combination "
-								Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
-								Printer.removeCursor()
+								Printer.info "The server is using authentication,\n"
+								Printer.info "starting brute-force ...\n"
+								request.get uri: target, auth: authO, timeout: timeOut ,  (err, r, body) ->
+									if err
+										Printer.error "ExternalBrute: connection problem: #{err}"
+									else
+										if body.error
+											Printer.error "ExternalBrute: problem parsing HTML body #{body.error}"
+										else
+											if /401 Authorization Required/.exec body
+												Printer.highlight "Last tested combination "
+												Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
+												Printer.removeCursor()
+											else
+												printBrutePass testUser, testPass
 							else
-								printBrutePass testUser, testPass
+								Printer.highlight "The server is NOT using authentication\n"
 
 	brute = (target, port, testUser, passwords, delay, type) =>
 		# File with passwords is provided.

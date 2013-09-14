@@ -177,6 +177,40 @@ class ExternalBrute extends EventEmitter
 							Printer.error "ExternalBrute: Connection problem #{err}"
 					else
 						printBrutePass testUser, testPass
+			when "ldap"
+				ldap = require "ldapjs"
+				ldap.Attribute.settings.guid_format = ldap.GUID_FORMAT_B
+
+				# First request to see if the server allows anonymous auth (defaut is yes).
+				isConnected = false
+				callback = () =>
+					if not isConnected
+						Printer.error "ExternalBrute: Connection problem"
+
+				setTimeout callback, timeOut
+				client0 = ldap.createClient(url: "ldap://#{target}:#{port}/")
+				client0.bind "", "", (err) ->
+					isConnected = true
+					if err
+						if /Invalid credentials/.exec body
+							Printer.info "The server does NOT allow anonymous authentication.\n"
+						else
+							Printer.error "ExternalBrute: Connection problem"
+					else
+						Printer.info "The server allows anonymous authentication.\n"
+					Printer.info "starting brute-force ...\n"
+					lpath = (testUser.split ",")[1..]
+					client = ldap.createClient(url: "ldap://#{target}:#{port}/#{lpath}")
+					client.bind testUser, testPass, (err) ->
+						if err
+							if /Invalid Credentials/.exec err
+								Printer.highlight "Last tested combination "
+								Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
+								Printer.removeCursor()
+							else
+								Printer.error "ExternalBrute: Connection problem"
+						else
+							printBrutePass testUser, testPass
 			when "http"
 				request = require "request"
 

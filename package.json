@@ -37,7 +37,8 @@
         "mysql" : "x",
         "ssh2" : "x",
         "jsftp" : "x",
-        "mongodb" : "x"
+        "mongodb" : "x",
+        "ldapjs" : "x"
 	},
 	"engines": {
 		"node": "0.10.x"

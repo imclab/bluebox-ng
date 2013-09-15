@@ -177,40 +177,63 @@ class ExternalBrute extends EventEmitter
 							Printer.error "ExternalBrute: Connection problem #{err}"
 					else
 						printBrutePass testUser, testPass
-			when "ldap"
-				ldap = require "ldapjs"
-				ldap.Attribute.settings.guid_format = ldap.GUID_FORMAT_B
+			when "tftp"
+				TFTP = require "tftp-client"
 
-				# First request to see if the server allows anonymous auth (defaut is yes).
-				isConnected = false
-				callback = () =>
-					if not isConnected
-						Printer.error "ExternalBrute: Connection problem"
+				# Initialize the tftp client
+				client = new TFTP(parseInt(port, 10), target)
 
-				setTimeout callback, timeOut
-				client0 = ldap.createClient(url: "ldap://#{target}:#{port}/")
-				client0.bind "", "", (err) ->
-					isConnected = true
+				# Read 1.txt from the server
+				client.read testUser, (err, data) ->
 					if err
-						if /Invalid credentials/.exec body
-							Printer.info "The server does NOT allow anonymous authentication.\n"
+						if /File not found/.exec err
+							Printer.highlight "Last tested file "
+							Printer.normal "\"#{testUser}\"\n"
+							Printer.removeCursor()
 						else
-							Printer.error "ExternalBrute: Connection problem"
+							Printer.error err
+							return
 					else
-						Printer.info "The server allows anonymous authentication.\n"
-					Printer.info "starting brute-force ...\n"
-					lpath = (testUser.split ",")[1..]
-					client = ldap.createClient(url: "ldap://#{target}:#{port}/#{lpath}")
-					client.bind testUser, testPass, (err) ->
+						Printer.info "\nFile found ("
+						Printer.infoHigh "#{testUser}"
+						Printer.info ")\n"
+						Printer.info "Data: \n"
+						dataContent = data.toString("utf8", 0, 100)
+						Printer.normal "#{data}\n"
+			when "ldap"
+					ldap = require "ldapjs"
+					ldap.Attribute.settings.guid_format = ldap.GUID_FORMAT_B
+
+					# First request to see if the server allows anonymous auth (defaut is yes).
+					isConnected = false
+					callback = () =>
+						if not isConnected
+							Printer.error "ExternalBrute: Connection problem"
+
+					setTimeout callback, timeOut
+					client0 = ldap.createClient(url: "ldap://#{target}:#{port}/")
+					client0.bind "", "", (err) ->
+						isConnected = true
 						if err
-							if /Invalid Credentials/.exec err
-								Printer.highlight "Last tested combination "
-								Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
-								Printer.removeCursor()
+							if /Invalid credentials/.exec body
+								Printer.info "The server does NOT allow anonymous authentication.\n"
 							else
 								Printer.error "ExternalBrute: Connection problem"
 						else
-							printBrutePass testUser, testPass
+							Printer.info "The server allows anonymous authentication.\n"
+						Printer.info "starting brute-force ...\n"
+						lpath = (testUser.split ",")[1..]
+						client = ldap.createClient(url: "ldap://#{target}:#{port}/#{lpath}")
+						client.bind testUser, testPass, (err) ->
+							if err
+								if /Invalid Credentials/.exec err
+									Printer.highlight "Last tested combination "
+									Printer.normal "\"#{testUser}\"/\"#{testPass}\"\n"
+									Printer.removeCursor()
+								else
+									Printer.error "ExternalBrute: Connection problem"
+							else
+								printBrutePass testUser, testPass
 			when "http"
 				request = require "request"
 

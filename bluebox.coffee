@@ -105,11 +105,13 @@ printCommands = () ->
 	Printer.highlight "ami-brute: "
 	Printer.normal "Try to brute-force valid credentials for Asterisk AMI service.\n"
 	Printer.highlight "db-brute: "
-	Printer.normal "Try to brute-force valid credentials for a DB (MySQL).\n"
+	Printer.normal "Try to brute-force valid credentials for a DB (MySQL/MongoDB).\n"
 	Printer.highlight "ssh-brute: "
 	Printer.normal "Try to brute-force valid credentials for a SSH server.\n"
 	Printer.highlight "sftp-brute: "
 	Printer.normal "Try to brute-force valid credentials for a FTP/SFTP server.\n"
+	Printer.highlight "tftp-brute: "
+	Printer.normal "Try to brute-force a valid file for a TFTP server.\n"	
 	Printer.highlight "ldap-brute: "
 	Printer.normal "Try to brute-force valid credentials for a LDAP/Active Directory server.\n"
 	Printer.highlight "http-brute: "
@@ -150,7 +152,7 @@ completer = (line) ->
 	completions = "\nall-auto shodan-search shodan-pop google-dorks "
 	completions += "sip-dns sip-scan sip-brute-ext sip-brute-ext-ast sip-brute-pass "
 	completions += "sip-unauth sip-unreg sip-bye sip-flood "
-	completions += "dumb-fuzz ami-brute db-brute ssh-brute sftp-brute "
+	completions += "dumb-fuzz ami-brute db-brute ssh-brute sftp-brute tftp-brute "
 	completions += "ldap-brute http-brute http-discover network-scan search-vulns "
 	completions += "shodan-host shodan-vulns shodan-query shodan-download default-pass "
 	completions += "geo-locate get-ext-ip clear help version quit exit"
@@ -803,6 +805,29 @@ runMenu = (shodanKey) ->
 											answer = delay if answer is ""
 											delay = answer
 											ExternalBrute.run target, lport, onlyExt, delay, passwords, "sftp"
+							else
+								Printer.error "Invalid port"
+					else
+						Printer.error "Invalid target"
+			when "tftp-brute"
+				Printer.configure()
+				Printer.info "ie: 192.168.122.1\n"
+				rl.question "* Target (#{target}): ", (answer) ->
+					answer = target if answer is ""
+					if (Utils.isIP answer)
+						target = answer
+						rl.question "* Port (69): ", (answer) ->
+							answer = "69" if answer is ""
+							if (Utils.validPort answer)
+								lport = answer
+								Printer.info "ie: \"spa000.cfg\", \"./data/john.txt\"\n"
+								rl.question "* Enter an file name or a file with files names (./data/tftp.txt): ", (answer) ->
+									answer = "./data/tftp.txt" if not answer
+									onlyExt = answer
+									rl.question "* Delay between requests (ms.) (#{delay}): ", (answer) ->
+										answer = delay if answer is ""
+										delay = answer
+										ExternalBrute.run target, lport, onlyExt, delay, "", "tftp"
 							else
 								Printer.error "Invalid port"
 					else

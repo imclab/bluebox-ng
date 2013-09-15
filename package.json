@@ -38,7 +38,8 @@
         "ssh2" : "x",
         "jsftp" : "x",
         "mongodb" : "x",
-        "ldapjs" : "x"
+        "ldapjs" : "x",
+        "tftp-client" : "x"
 	},
 	"engines": {
 		"node": "0.10.x"

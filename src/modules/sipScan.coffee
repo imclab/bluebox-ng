@@ -49,7 +49,7 @@ class SipScan extends EventEmitter
 		Printer.result info.version
 		Printer.info "\nMessage:\n"
 		Printer.normal info.message
-		Printer.infoHigh "\n\nAUTHENTICATION =>\n"
+		Printer.infoHigh "\nAUTHENTICATION =>\n"
 		Printer.highlight "\n#{hasAuth}\n"
 
 

@@ -39,7 +39,8 @@
         "jsftp" : "x",
         "mongodb" : "x",
         "ldapjs" : "x",
-        "tftp-client" : "x"
+        "tftp-client" : "x",
+        "netxflow" : "x"
 	},
 	"engines": {
 		"node": "0.10.x"

@@ -63,7 +63,7 @@ Developer guide
 - Styleguide:
  - Always use camelCase, never underscores
  - Use soft-tabs with a four space indent
- - Follow the style of any os the actual modules
+ - Follow the style of the actual modules
 
 
 License

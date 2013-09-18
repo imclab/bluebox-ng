@@ -35,6 +35,7 @@ Issues
 
 Features
 --------
+- Auto VoIP/UC penetration test (Coming soon)
 - RFC compliant
 - TLS and IPv6 support
 - SIP over websockets (and WSS) support (draft-ietf-sipcore-sip-websocket-08)
@@ -52,6 +53,7 @@ Features
 - Colored output
 - Command completion
 - It runs in GNU/Linux, Mac OS X and Windows
+- Other common protocols brute-force: Asterisk AMI, MySQL, MongoDB, SSH, (S)FTP, HTTP(S), TFTP, LDAP
 
 
 Developer guide

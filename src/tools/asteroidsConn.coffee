@@ -59,7 +59,6 @@ class AsteroidsConn extends EventEmitter
 				@client.on "message", (msg, rinfo) =>
 					@emit "newMessage", msg
 					@connected = true
-					@client.close()
 
 				@client.on "error", (error) ->
 					@emit "error", error
@@ -84,7 +83,6 @@ class AsteroidsConn extends EventEmitter
 				
 				@client.on "data", (data) =>
 					@emit "newMessage", data
-					@client.destroy()
 
 				if @transport is "TCP"
 					@client.on "connect", () =>
@@ -109,7 +107,6 @@ class AsteroidsConn extends EventEmitter
 					connection.on "message", (recMessage) =>
 						recMessage = recMessage.utf8Data
 						@emit "newMessage", recMessage
-						connection.close()
 					
 					connection.sendUTF message
 				

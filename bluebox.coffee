@@ -180,7 +180,7 @@ runMenu = (shodanKey) ->
 	# TODO: Available: 4 (ipv4), 6 (ipv6).
 	# ipVersion = 4
 	# Delay between requests (in ms.).
-	delay = 1000
+	delay = 300
 	rangeExt = "100-999"
 	onlyExt = "100"
 	onlyExtTo = "bluebox"

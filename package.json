@@ -40,7 +40,7 @@
         "mongodb" : "x",
         "ldapjs" : "x",
         "tftp-client" : "x",
-        "netxflow" : "x"
+        "nextflow" : "x"
 	},
 	"engines": {
 		"node": "0.10.x"

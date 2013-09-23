@@ -98,4 +98,6 @@ class Printer
 	
 	@printEnum = (extension, auth) ->
 		Printer.info "\nExtension found: "
-		Printer.result "#{extension} (#{auth})\n"
+		Printer.result "#{extension}"
+		Printer.resutl " (#{auth})" if auth
+		Printer.result "\n"

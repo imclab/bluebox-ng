@@ -39,6 +39,7 @@ exports.SipBrutePass =
 class SipBrutePass extends EventEmitter
 
 	@emitter = new EventEmitter
+	@passFound = false
 	
 	printBrutePass = (ext, pass) ->
 		Printer.info "\nPassword found (ext. "
@@ -47,22 +48,7 @@ class SipBrutePass extends EventEmitter
 		Printer.result "#{pass}\n"
 
 
-	# It gets the fingerprint and print it with the rest of the outpupt.
-	parseReply = (msg, testExt, testPass, type) ->
-		# Response parsing.
-		code = Parser.parseCode msg
-		switch code
-			when "200"
-				printBrutePass testExt, testPass if (type in ["REGISTER", "PUBLISH"])
-			when "404"
-				printBrutePass testExt, testPass if (type not in ["REGISTER", "PUBLISH"])
-			else
-				Printer.highlight "Last tested combination "
-				Printer.normal "\"#{testExt}\"/\"#{testPass}\"\n"
-				Printer.removeCursor()
-
-
-	oneBrute = (target, port, path, srcHost, transport, type, testExt, password) ->
+	oneBrute = (target, port, path, srcHost, transport, type, testExt, password) =>
 		cseq = 1
 		callId = "#{Utils.randomString 16}"
 		if (Utils.isIP6 target)
@@ -79,7 +65,7 @@ class SipBrutePass extends EventEmitter
 		msgSend = (String) msgObj.create()
 		conn = new AsteroidsConn target, port, path, transport, lport
 		
-		conn.on "newMessage", (stream) ->
+		conn.on "newMessage", (stream) =>
 			# Response parsing.
 			# Sometimes servers sends non-interesting responeses,
 			# ie: "403 Forbidden" when registering an already registered user.
@@ -93,9 +79,20 @@ class SipBrutePass extends EventEmitter
 					msgSend = (String) msgObj.create()
 					conn1 = new AsteroidsConn target, port, path, transport, lport
 			
-					conn1.on "newMessage", (stream) ->
+					conn1.on "newMessage", (stream) =>
 						# First request parsing.
-						parseReply stream, testExt, password, type	
+						code = Parser.parseCode stream
+						switch code
+							when "200"
+								@passFound = true
+								printBrutePass testExt, password if (type in ["REGISTER", "PUBLISH"])
+							when "404"
+								@passFound = true
+								printBrutePass testExt, password if (type not in ["REGISTER", "PUBLISH"])
+							else
+								Printer.highlight "Last tested combination "
+								Printer.normal "\"#{testExt}\"/\"#{password}\"\n"
+								Printer.removeCursor()
 
 					conn1.on "error", (error) ->
 						Printer.error "SipBrutePass: #{error}"
@@ -111,7 +108,10 @@ class SipBrutePass extends EventEmitter
 		conn.send msgSend
 	
 	
-	brute = (target, port, path, srcHost, transport, type, testExt, passwords, delay) =>
+	brute = (target, port, path, srcHost, transport, type, testExt, passwords, delay, extAsPass) =>
+		# Test the name of the extension as password if it was specified
+		if extAsPass is "yes"
+			oneBrute target, port, path, srcHost, transport, type, testExt, testExt
 		# File with passwords is provided.
 		if (Grammar.fileRE.exec passwords)
 			fs.readFile passwords, (err, data) =>
@@ -122,7 +122,7 @@ class SipBrutePass extends EventEmitter
 					doLoopString = (i) =>
 						setTimeout(=>
 							oneBrute target, port, path, srcHost, transport, type, testExt, splitData[i]
-							if i < splitData.length - 1
+							if ((i < splitData.length - 1) and (not @passFound))
 								doLoopString(parseInt(i, 10) + 1)
 							else
 								@emitter.emit "passBlockEnd", "Block of passwords ended"
@@ -134,7 +134,7 @@ class SipBrutePass extends EventEmitter
 			@emitter.emit "passBlockEnd", "Block of passwords ended"
 
 
-	@run = (target, port, path, srcHost, transport, type, extensions, delay, passwords) ->
+	@run = (target, port, path, srcHost, transport, type, extensions, delay, passwords, extAsPass) ->
 		Printer.normal "\n"
 		# Needed to work with Node module net.isIPv6 function.
 		if (/:/.test target)
@@ -147,11 +147,12 @@ class SipBrutePass extends EventEmitter
 			
 			@emitter.on "passBlockEnd", (msg) ->
 				if i < parseInt(rangeExtParsed.maxExt, 10)
+					@passFound = false
 					i += 1
-					brute target, port, path, srcHost, transport, type, i, passwords, delay
+					brute target, port, path, srcHost, transport, type, i, passwords, delay, extAsPass
 
 			# First request
-			brute target, port, path, srcHost, transport, type, rangeExtParsed.minExt, passwords, delay
+			brute target, port, path, srcHost, transport, type, rangeExtParsed.minExt, passwords, delay, extAsPass
 		# File with extensions.
 		else
 			if (Grammar.fileRE.exec extensions)
@@ -164,10 +165,10 @@ class SipBrutePass extends EventEmitter
 						@emitter.on "passBlockEnd", (msg) ->
 							if i < splitData.length - 1
 								i += 1
-								brute target, port, path, srcHost, transport, type, splitData[i], passwords, delay
+								brute target, port, path, srcHost, transport, type, splitData[i], passwords, delay, extAsPass
 
 						# First request
-						brute target, port, path, srcHost, transport, type, splitData[i], passwords, delay
+						brute target, port, path, srcHost, transport, type, splitData[i], passwords, delay, extAsPass
 			# Unique extension.
 			else
-				brute target, port, path, srcHost, transport, type, extensions, passwords, delay
+				brute target, port, path, srcHost, transport, type, extensions, passwords, delay, extAsPass

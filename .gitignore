@@ -10,7 +10,6 @@ src/modules/private/*
 # Custon options
 options.json
 
-
 # .js stuff
 *.js
 /src/modules/*.js

@@ -79,16 +79,15 @@ printCommands = () ->
 	Printer.highlight "google-dorks: "
 	Printer.normal "Find potential targets using a Google dork.\n"
 	Printer.infoHigh "\nSIP\n"
-#	Printer.highlight "sip-auto: "
-#	Printer.normal "Automate SIP pentesting process.\n"
 	Printer.highlight "sip-dns: "
 	Printer.normal "DNS SRV and NAPTR discovery.\n"
 	Printer.highlight "sip-scan: "
 	Printer.normal "A SIP host/port scanning tool.\n"
 	Printer.highlight "sip-brute-ext: "
-	Printer.normal "Try to brute-force valid extensions of the SIP server.\n"
-	Printer.highlight "sip-brute-ext-ast: "
-	Printer.normal "Try to brute-force valid extensions in Asterisk (CVE-2011-4597).\n"
+	Printer.normal "Try to brute-force valid extensions of the SIP server using\n"
+	Printer.normal "REGISTER (CVE-2011-2536) or INVITE (no CVE, http://goo.gl/8LRh6s) requests.\n"
+	Printer.highlight "sip-brute-ext-nat: "
+	Printer.normal "Try to brute-force valid extensions in Asterisk using different NAT settings (CVE-2011-4597).\n"
 	Printer.highlight "sip-brute-pass: "
 	Printer.normal "Try to brute-force the password for an extension.\n"
 	Printer.highlight "sip-unauth: "
@@ -150,7 +149,7 @@ printCommands = () ->
 # Command completion definition.
 completer = (line) ->
 	completions = "\nall-auto shodan-search shodan-pop google-dorks "
-	completions += "sip-dns sip-scan sip-brute-ext sip-brute-ext-ast sip-brute-pass "
+	completions += "sip-dns sip-scan sip-brute-ext sip-brute-ext-nat sip-brute-pass "
 	completions += "sip-unauth sip-unreg sip-bye sip-flood "
 	completions += "dumb-fuzz ami-brute db-brute ssh-brute sftp-brute tftp-brute "
 	completions += "ldap-brute http-brute http-discover network-scan search-vulns "
@@ -366,32 +365,39 @@ runMenu = (shodanKey) ->
 								rl.question "* Port (#{port}): ", (answer) ->
 									answer = port if answer is ""
 									if (Utils.validPort answer)
-										port = answer										
+										port = answer							
 										Printer.info "tip: Use comand \"get-ext-ip\" to get you external IP automatically\n"
 										rl.question "* Source IP, SIP layer (random): ", (answer) ->
 											srcHost = answer
-											Printer.info "ie: \"100-999\", \"./data/extensions.txt\"\n"
-											rl.question "* Enter an extension, a range or a file (#{rangeExt}): ", (answer) ->
-												answer = rangeExt if answer is ""
-												rangeExt = answer
-												rl.question "* Delay between requests (ms.) (#{delay}): ", (answer) ->
-													answer = delay if answer is ""
-													delay = answer
-													if transport is "WS" or transport is "WSS"									
-														Printer.info "tip: You should provide a \"Path\" using WS (or WSS)\n"
-														Printer.info "tip: Final format \"ws://Target:Port:Path\"\n"
-														rl.question "* Path (#{path}): ", (answer) ->
-															path = answer
-															SipBruteExt.run target, port, path, srcHost, transport, "REGISTER", rangeExt, delay
-													else
-															SipBruteExt.run target, port, "", srcHost, transport, "REGISTER", rangeExt, delay
+											Printer.info  "REGISTER, INVITE\n"
+											rl.question "* Type (REGISTER): ", (answer) ->
+												answer = "REGISTER" if answer is ""
+												if answer in ["REGISTER", "INVITE"]
+													ltype = answer
+													Printer.info "ie: \"100-999\", \"./data/extensions.txt\"\n"
+													rl.question "* Enter an extension, a range or a file (#{rangeExt}): ", (answer) ->
+														answer = rangeExt if answer is ""
+														rangeExt = answer
+														rl.question "* Delay between requests (ms.) (#{delay}): ", (answer) ->
+															answer = delay if answer is ""
+															delay = answer
+															if transport is "WS" or transport is "WSS"									
+																Printer.info "tip: You should provide a \"Path\" using WS (or WSS)\n"
+																Printer.info "tip: Final format \"ws://Target:Port:Path\"\n"
+																rl.question "* Path (#{path}): ", (answer) ->
+																	path = answer
+																	SipBruteExt.run target, port, path, srcHost, transport, ltype, rangeExt, delay
+															else
+																	SipBruteExt.run target, port, "", srcHost, transport, ltype, rangeExt, delay
+												else
+													Printer.error "Invalid type"
 									else
 										Printer.error "Invalid port"
 							else
 								Printer.error "Invalid transport"
 					else
 						Printer.error "Invalid target"
-			when "sip-brute-ext-ast"
+			when "sip-brute-ext-nat"
 				Printer.configure()
 				Printer.info "ie: 192.168.122.1\n"
 				rl.question "* Target (#{target}): ", (answer) ->
@@ -442,27 +448,34 @@ runMenu = (shodanKey) ->
 												answer = onlyExt if not answer
 												onlyExt = answer
 												Printer.info "ie: \"100\", \"./data/passwords.txt\"\n"
-												rl.question "* Enter an password or a file (./data/john.txt): ", (answer) ->
-													answer = "./data/john.txt" if not answer
+												rl.question "* Enter an password or a file (./data/numsPad3.txt): ", (answer) ->
+													answer = "./data/numsPad3.txt" if not answer
 													passwords = answer
-													Printer.info "#{requestTypes}\n"
-													rl.question "* Type (REGISTER): ", (answer) ->
-														answer = "REGISTER" if answer is ""
-														if answer in requestTypes
-															rtype = answer
-															rl.question "* Delay between requests (ms.) (#{delay}): ", (answer) ->
-																answer = delay if answer is ""
-																delay = answer
-																if transport is "WS" or transport is "WSS"									
-																	Printer.info "tip: You should provide a \"Path\" using WS (or WSS)\n"
-																	Printer.info "tip: Final format \"ws://Target:Port:Path\"\n"
-																	rl.question "* Path (#{path}): ", (answer) ->
-																		path = answer
-																		SipBrutePass.run target, port, path, srcHost, transport, rtype, onlyExt, delay, passwords
+													Printer.info "opt: yes, no\n"
+													rl.question "* Try also the name of the extension as password? (yes): ", (answer) ->
+														answer = "yes" if answer is ""
+														if answer in ["yes","no"]
+															extAsPass = answer
+															Printer.info "#{requestTypes}\n"
+															rl.question "* Type (REGISTER): ", (answer) ->
+																answer = "REGISTER" if answer is ""
+																if answer in requestTypes
+																	rtype = answer
+																	rl.question "* Delay between requests (ms.) (#{delay}): ", (answer) ->
+																		answer = delay if answer is ""
+																		delay = answer
+																		if transport is "WS" or transport is "WSS"									
+																			Printer.info "tip: You should provide a \"Path\" using WS (or WSS)\n"
+																			Printer.info "tip: Final format \"ws://Target:Port:Path\"\n"
+																			rl.question "* Path (#{path}): ", (answer) ->
+																				path = answer
+																				SipBrutePass.run target, port, path, srcHost, transport, rtype, onlyExt, delay, passwords, extAsPass
+																		else
+																				SipBrutePass.run target, port, "", srcHost, transport, rtype, onlyExt, delay, passwords, extAsPass
 																else
-																		SipBrutePass.run target, port, "", srcHost, transport, rtype, onlyExt, delay, passwords
+																	Printer.error "Invalid type"
 														else
-															Printer.error "Invalid type"		
+															Printer.error "Invalid response"
 									else
 										Printer.error "Invalid port"
 							else

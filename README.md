@@ -28,7 +28,7 @@ Install
 
 
 Issues
-------------
+------
 - This is an Beta version, so some know bugs are described here: [https://github.com/jesusprubio/bluebox-ng/issues](https://github.com/jesusprubio/bluebox-ng/issues)
 - If you have doubts playing with the software, please use this GitHub section labeling the issue as "question"
 
@@ -41,8 +41,7 @@ Features
 - SIP over websockets (and WSS) support (draft-ietf-sipcore-sip-websocket-08)
 - SHODAN, exploitsearch.net and Google Dorks
 - SIP common security tools (scan, extension/password bruteforce, etc.)
-- REGISTER, OPTIONS, INVITE, MESSAGE, SUBSCRIBE, PUBLISH, OK, ACK, CANCEL, BYE and Ringing requests support
-- Authentication through different types of requests
+- Authentication and extension brute-forcing through different types of requests
 - SIP denial of service (DoS) testing
 - SRV and NAPTR discovery
 - Dumb fuzzing
@@ -54,6 +53,40 @@ Features
 - Command completion
 - It runs in GNU/Linux, Mac OS X and Windows
 - Other common protocols brute-force: Asterisk AMI, MySQL, MongoDB, SSH, (S)FTP, HTTP(S), TFTP, LDAP
+
+
+Actual modules
+--------------
+- *shodan-search*: Find potential targets in SHODAN computer search engine.
+- *shodan-pop*: Quick access to popular SHODAN VoIP related queries.
+- *google-dorks: Find potential targets using a Google dork.
+- *sip-dns*: DNS SRV and NAPTR discovery.
+- *sip-scan*: A SIP host/port scanning tool.
+- *sip-brute-ext*: Try to brute-force valid extensions of the SIP server using REGISTER (CVE-2011-2536) or INVITE (no CVE, [http://goo.gl/8LRh6s](http://goo.gl/8LRh6s)) requests.
+- *sip-brute-ext-nat*: Try to brute-force valid extensions in Asterisk using different NAT settings (CVE-2011-4597).
+- *sip-brute-pass*: Try to brute-force the password for an extension.
+- *sip-unauth*: Try know if a SIP server allows unauthenticated calls.
+- *sip-unreg*: Try to unregister another endpoint.
+- *sip-bye*: Use BYE teardown to end an active call.
+- *sip-flood*: Denial of service (DoS) protection mechanism stress test.
+- *dumb-fuzz*: Really stupid fuzzer.
+- *ami-brute*: Try to brute-force valid credentials for Asterisk AMI service.
+- *db-brute*: Try to brute-force valid credentials for a DB (MySQL/MongoDB).
+- *ssh-brute*: Try to brute-force valid credentials for a SSH server.
+- *sftp-brute*: Try to brute-force valid credentials for a FTP/SFTP server.
+- *tftp-brute*: Try to brute-force a valid file for a TFTP server.
+- *ldap-brute*: Try to brute-force valid credentials for a LDAP/Active Directory server.
+- *http-brute*: Try to brute-force valid credentials for an HTTP server.
+- *http-discover*: Discover common web panel of a VoIP servers in a host (Dirscan-node).
+- *network-scan*: Host/port scanning (Evilscan).
+- *shodan-host*: Get indexed info of an IP address in SHODAN.
+- *shodan-vulns*': Find vulnerabilities and exploit for an specifig service version (using SHODAN API).
+- *shodan-query*: Use a customized SHODAN VoIP query.
+- *shodan-download*: Download an exploit.
+- *search-vulns*: Find vulnerabilities and exploit for an specifig service version (using exploitsearch.net API).
+- *default-pass*: Show common VoIP system default passwords.
+- *geo-locate*: Geolozalization (Maxmind DB).
+- *get-ext-ip*: Get you external IP address (icanhazip.com).
 
 
 Developer guide

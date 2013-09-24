@@ -8,19 +8,16 @@ Bluebox-ng is a GPL VoIP/UC vulnerability scanner. It has been written in Coffee
 Install
 -------
 **GNU/Linux and Mac OS X**
-
 - Install Node.js:
  - Linux: [https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager)
  - Mac: [http://nodejs.org/download/](http://nodejs.org/download/)
-- *cd bluebox-ng*
-- *chmod +x setup.sh* (just in case)
-- *./setup.sh*
-- *./bluebox.sh*
 
 **Windows**
-
 - Install Node.js: [http://nodejs.org/download/](http://nodejs.org/download/)
 - Install Gow (the lightweight alternative to Cygwin): [https://github.com/bmatzelle/gow/wiki](https://github.com/bmatzelle/gow/wiki)
+
+**All**
+- *git clone https://github.com/jesusprubio/bluebox-ng/*
 - *cd bluebox-ng*
 - *chmod +x setup.sh* (just in case)
 - *setup.sh*

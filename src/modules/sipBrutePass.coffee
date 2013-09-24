@@ -109,6 +109,7 @@ class SipBrutePass extends EventEmitter
 	
 	
 	brute = (target, port, path, srcHost, transport, type, testExt, passwords, delay, extAsPass) =>
+		@passFound = false
 		# Test the name of the extension as password if it was specified
 		if extAsPass is "yes"
 			oneBrute target, port, path, srcHost, transport, type, testExt, testExt

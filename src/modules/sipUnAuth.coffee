@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 exports.SipUnAuth =
 class SipUnAuth	
 
-	@run : (target, port, path, srcHost, transport, fromExt, toExt) ->
+	@run = (target, port, path, srcHost, transport, fromExt, toExt) ->
 		lport = Utils.randomPort()
 		# Needed to work with Node module net.isIPv6 function.
 		if (/:/.test target)
@@ -53,8 +53,6 @@ class SipUnAuth
 					Printer.highlight "\nTarget seems NOT to accept calls to this destination, but you should add authentication for calling.\n"
 				when "401", "407", ""
 					Printer.highlight "\nTarget seems NOT to accept unauthenticated calls.\n"
-				else
-					Printer.highlight "\nUndefined error code: #{code}.\n"
-		
+
 		conn.on "error", (error) ->
 			Printer.printError "SipUnAuth: #{error}"

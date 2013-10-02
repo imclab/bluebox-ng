@@ -31,8 +31,8 @@ fs = require "fs"
 
 # ----------------------- Class ----------------------------------
 
-# This class includes one function which  sends a valid SIP request and parse 
-# the response looking for a string with "User-Agent:", "Server:" or 
+# This class includes one function which  sends a valid SIP request and parse
+# the response looking for a string with "User-Agent:", "Server:" or
 # "Organization" to get info about the SIP service which running on the target.
 exports.SipBruteExt =
 class SipBruteExt
@@ -51,12 +51,12 @@ class SipBruteExt
 		msgSend = (String) msgObj.create()
 		conn = new AsteroidsConn target, port, path, transport, lport
 		firstResponse = true
-					
+
 		conn.on "newMessage", (stream) ->
 			# TODO: We need to be more polited here, an ACK and BYE is needed
 			# to avoid loops.
 			if firstResponse
-				firstResponse = false	
+				firstResponse = false
 				code = Parser.parseCode stream
 				if type is "REGISTER"
 					switch code
@@ -79,7 +79,7 @@ class SipBruteExt
 
 		conn.on "error", (error) ->
 			Printer.error "SipBruteExt: #{error}"
-			
+
 		conn.send msgSend
 
 
@@ -128,7 +128,7 @@ class SipBruteExt
 		conn = new AsteroidsConn target, port, path, transport, lport
 		conn.send msgSend
 		goodResponse = false
-		
+
 		conn.on "newMessage", (stream) ->
 			code = Parser.parseCode(stream)
 			# First request parsing.
@@ -141,7 +141,7 @@ class SipBruteExt
 					if code in ["401","407"]
 						printIsVuln false
 						goodResponse = true
-					else 
+					else
 						if code is "404"
 							goodResponse = true
 							printIsVuln true
@@ -150,7 +150,7 @@ class SipBruteExt
 					# No CVE, some links:
 					# http://packetstormsecurity.com/search/?q=francesco+tornieri+SIP+User+Enumeration&s=files
 					# Still not implemented: http://packetstormsecurity.com/files/100515/Asterisk-1.4.x-1.6.x-Username-Enumeration.html
-					if code in ["100","407","484"]
+					if code in ["100","407","404","484"]
 						goodResponse = true
 						printIsVuln true
 						doEnum target, port, path, srcHost, transport, type, rangeExt, delay

@@ -35,12 +35,12 @@ class Printer
 	resultColor = 46
 	errorColor = 9
 	highLightColor = 202
-	
+
 
 	@normal = (note) ->
 		process.stdout.write note
 
-	
+
 	@info = (note) ->
 		data = clc.xterm(infoColor) "#{note}"
 		process.stdout.write data
@@ -50,17 +50,17 @@ class Printer
 		data = clc.xterm(infoHighColor) "#{note}"
 		process.stdout.write data
 
-		
+
 	@result = (result) ->
 		data = clc.xterm(resultColor) "#{result}"
 		process.stdout.write data
 
-		
+
 	@error = (error) ->
 		data = clc.xterm(errorColor) "\nERROR: #{error}\n\n"
 		process.stdout.write data
 
-		
+
 	@highlight = (string) ->
 		data = clc.xterm(highLightColor) "#{string}"
 		process.stdout.write data
@@ -89,15 +89,15 @@ class Printer
 	@welcome = () ->
 		data = clc.bold "\n\tWelcome to Bluebox-ng (v. beta)\n\n"
 		process.stdout.write data
-		
-	
+
+
 	@configure = () ->
 		data = clc.xterm(infoHighColor) "\n>> MODULE SETUP\n\n"
 		process.stdout.write data
-	
-	
+
+
 	@printEnum = (extension, auth) ->
 		Printer.info "\nExtension found: "
 		Printer.result "#{extension}"
-		Printer.resutl " (#{auth})" if auth
+		Printer.result " (#{auth})" if auth
 		Printer.result "\n"

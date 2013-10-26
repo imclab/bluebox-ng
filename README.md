@@ -1,4 +1,4 @@
-[![bluebox-ng](https://dl.dropboxusercontent.com/s/fvnxjolk0wjza9v/Bluebox_logo.svg?dl=1&token_hash=AAFbFGTrXirXj4eFSkToscXgnP3k_boZ8SGDqJQ0R-2Elg)]
+![bluebox-ng](https://dl.dropboxusercontent.com/s/fvnxjolk0wjza9v/Bluebox_logo.svg?dl=1&token_hash=AAFbFGTrXirXj4eFSkToscXgnP3k_boZ8SGDqJQ0R-2Elg)
 
 Bluebox-ng
 ==========

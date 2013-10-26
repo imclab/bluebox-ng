@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # ---------------------- Requires --------------------------------
-
 readline = require "readline"
 fs = require "fs"
 {Printer} = require "./src/tools/printer"

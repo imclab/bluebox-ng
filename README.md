@@ -1,3 +1,5 @@
+[![bluebox-ng](https://dl.dropboxusercontent.com/s/fvnxjolk0wjza9v/Bluebox_logo.svg?dl=1&token_hash=AAFbFGTrXirXj4eFSkToscXgnP3k_boZ8SGDqJQ0R-2Elg)]
+
 Bluebox-ng
 ==========
 Bluebox-ng is a GPL VoIP/UC vulnerability scanner. It has been written in CoffeeScript using Node.js powers. This project is "our 2 cents" to help to improve information security practices in this kind of environments.

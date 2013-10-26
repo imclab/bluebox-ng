@@ -32,15 +32,17 @@ fs = require "fs"
 
 # ----------------------- Class ----------------------------------
 
-# This class includes one function which  sends a valid SIP request and parse 
-# the response looking for a string with "User-Agent:", "Server:" or 
+# This class includes one function which  sends a valid SIP request and parse
+# the response looking for a string with "User-Agent:", "Server:" or
 # "Organization" to get info about the SIP service which running on the target.
 exports.SipBrutePass =
 class SipBrutePass extends EventEmitter
 
 	@emitter = new EventEmitter
+	# ???
+	@emitter.setMaxListeners(0)
 	@passFound = false
-	
+
 	printBrutePass = (ext, pass) ->
 		Printer.info "\nPassword found (ext. "
 		Printer.infoHigh "#{ext}"
@@ -60,11 +62,11 @@ class SipBrutePass extends EventEmitter
 		# Just in case of WS/WSS.
 		gruuInstance = "urn:uuid:#{Utils.randomString 3}-#{Utils.randomString 4}-#{Utils.randomString 8}"
 
-		# TODO: Maybe it could be better to call the same extension that is doing the call 
+		# TODO: Maybe it could be better to call the same extension that is doing the call
 		msgObj = new SipMessage type, "", target, port, srcHost, lport, testExt, toExt, transport, "", "", "", false, cseq, callId, gruuInstance, "", "", ""
 		msgSend = (String) msgObj.create()
 		conn = new AsteroidsConn target, port, path, transport, lport
-		
+
 		conn.on "newMessage", (stream) =>
 			# Response parsing.
 			# Sometimes servers sends non-interesting responeses,
@@ -78,7 +80,7 @@ class SipBrutePass extends EventEmitter
 					msgObj = new SipMessage type, "", target, port, srcHost, lport, testExt, toExt, transport, parsedAuth.realm, parsedAuth.nonce, password, parsedAuth.isProxy, cseq + 1 , callId, gruuInstance, "", "", ""
 					msgSend = (String) msgObj.create()
 					conn1 = new AsteroidsConn target, port, path, transport, lport
-			
+
 					conn1.on "newMessage", (stream) =>
 						# First request parsing.
 						code = Parser.parseCode stream
@@ -104,10 +106,10 @@ class SipBrutePass extends EventEmitter
 
 		conn.on "error", (error) ->
 			Printer.error "SipBrutePass: #{error}"
-		
+
 		conn.send msgSend
-	
-	
+
+
 	brute = (target, port, path, srcHost, transport, type, testExt, passwords, delay, extAsPass) =>
 		@passFound = false
 		# Test the name of the extension as password if it was specified
@@ -145,7 +147,7 @@ class SipBrutePass extends EventEmitter
 		if (Grammar.extRangeRE.exec extensions)
 			rangeExtParsed = Parser.parseExtRange extensions
 			i = parseInt(rangeExtParsed.minExt, 10)
-			
+
 			@emitter.on "passBlockEnd", (msg) ->
 				if i < parseInt(rangeExtParsed.maxExt, 10)
 					@passFound = false
